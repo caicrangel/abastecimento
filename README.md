@@ -95,3 +95,24 @@ docker compose exec mysql mysql -uroot -p${MYSQL_ROOT_PASSWORD} abastecimento  #
 docker compose down                  # para tudo (mantem dados)
 docker compose down -v               # para e apaga volume do BD
 ```
+
+## Diagnostico
+
+Endpoint de saude (sem autenticacao, mostra status do BD e config sem expor segredos):
+
+```bash
+curl http://localhost:3000/api/debug/health
+```
+
+Testar login manualmente:
+
+```bash
+# Recebe o cookie de sessao
+curl -i -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' \
+  -c cookies.txt
+
+# Usa o cookie para validar sessao
+curl -b cookies.txt http://localhost:3000/api/auth/me
+```
