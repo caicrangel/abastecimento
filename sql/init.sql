@@ -37,9 +37,12 @@ CREATE TABLE IF NOT EXISTS leituras_bomba (
   id INT AUTO_INCREMENT PRIMARY KEY,
   bomba_id INT NOT NULL,
   user_id INT NOT NULL,
+  user_encerramento_id INT NULL,
   data_leitura DATE NOT NULL,
+  data_inicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  data_encerramento DATETIME NULL,
   iniciante DECIMAL(12,2) NOT NULL,
-  encerrante DECIMAL(12,2) NOT NULL,
+  encerrante DECIMAL(12,2) NULL,
   foto_iniciante LONGBLOB,
   foto_iniciante_mime VARCHAR(50),
   foto_encerrante LONGBLOB,
@@ -48,8 +51,10 @@ CREATE TABLE IF NOT EXISTS leituras_bomba (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_leitura_bomba FOREIGN KEY (bomba_id) REFERENCES bombas(id) ON DELETE RESTRICT,
   CONSTRAINT fk_leitura_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_leitura_user_enc FOREIGN KEY (user_encerramento_id) REFERENCES users(id) ON DELETE SET NULL,
   INDEX idx_leitura_data (data_leitura),
-  INDEX idx_leitura_bomba (bomba_id)
+  INDEX idx_leitura_bomba (bomba_id),
+  INDEX idx_leitura_aberta (encerrante)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS abastecimentos (

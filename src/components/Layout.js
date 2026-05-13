@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import AlertaEncerrante from './AlertaEncerrante';
 
 export default function Layout({ children, user }) {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function Layout({ children, user }) {
         <nav>
           <Link href="/abastecimento" className={linkClass('/abastecimento')}>Abastecimento</Link>
           <Link href="/bombas" className={linkClass('/bombas')}>Bombas</Link>
+          <Link href="/relatorios" className={linkClass('/relatorios')}>Relatorios</Link>
           {isAdmin && (
             <>
               <Link href="/admin/veiculos" className={linkClass('/admin/veiculos')}>Veiculos</Link>
@@ -70,6 +72,7 @@ export default function Layout({ children, user }) {
           </button>
         </div>
       </div>
+      <AlertaEncerrante />
       <div className="container">{typeof children === 'function' ? children(u) : children}</div>
     </>
   );

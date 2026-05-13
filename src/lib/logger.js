@@ -1,9 +1,7 @@
-function ts() {
-  return new Date().toISOString();
-}
+import { timestampPtBR } from './format';
 
 export const log = {
-  info: (...args) => console.log(`[${ts()}] [info]`, ...args),
-  warn: (...args) => console.warn(`[${ts()}] [warn]`, ...args),
-  error: (...args) => console.error(`[${ts()}] [error]`, ...args),
+  info: (...args) => console.log(`[${timestampPtBR()}] [info]`, ...args),
+  warn: (...args) => console.warn(`[${timestampPtBR()}] [warn]`, ...args),
+  error: (...args) => console.error(`[${timestampPtBR()}] [error]`, ...args),
 };

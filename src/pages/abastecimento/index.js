@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
+import { formatDateTime, formatInt, formatNumber } from '@/lib/format';
 
 export default function AbastecimentoList() {
   const [rows, setRows] = useState([]);
@@ -70,12 +71,12 @@ export default function AbastecimentoList() {
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.id}>
-                    <td>{new Date(r.data_abastecimento).toLocaleString('pt-BR')}</td>
+                    <td>{formatDateTime(r.data_abastecimento)}</td>
                     <td><strong>{r.prefixo}</strong>{r.placa ? ` (${r.placa})` : ''}</td>
                     <td>{r.bomba_codigo || '-'}</td>
-                    <td>{Number(r.odometro).toLocaleString('pt-BR')}</td>
-                    <td>{Number(r.qtd_diesel).toFixed(2)}</td>
-                    <td>{Number(r.qtd_arla32).toFixed(2)}</td>
+                    <td>{formatInt(r.odometro)}</td>
+                    <td>{formatNumber(r.qtd_diesel)}</td>
+                    <td>{formatNumber(r.qtd_arla32)}</td>
                     <td>{r.operador}</td>
                     <td>
                       {r.tem_foto ? (

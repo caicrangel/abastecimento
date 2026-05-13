@@ -3,16 +3,14 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import FotoCaptura from '@/components/FotoCaptura';
 
-export default function NovaLeitura() {
+export default function AbrirLeitura() {
   const router = useRouter();
   const [bombas, setBombas] = useState([]);
   const [form, setForm] = useState({
     bomba_id: '',
     data_leitura: new Date().toISOString().slice(0, 10),
     iniciante: '',
-    encerrante: '',
     foto_iniciante: '',
-    foto_encerrante: '',
     observacao: '',
   });
   const [erro, setErro] = useState('');
@@ -33,15 +31,11 @@ export default function NovaLeitura() {
     setSucesso('');
     if (!form.bomba_id) { setErro('Selecione a bomba'); return; }
     if (!form.foto_iniciante) { setErro('Foto do iniciante obrigatoria'); return; }
-    if (!form.foto_encerrante) { setErro('Foto do encerrante obrigatoria'); return; }
-    if (Number(form.encerrante) < Number(form.iniciante)) {
-      setErro('Encerrante deve ser maior ou igual ao iniciante');
-      return;
-    }
     setSalvando(true);
     try {
       const r = await fetch('/api/leituras-bomba', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
@@ -51,20 +45,22 @@ export default function NovaLeitura() {
         setSalvando(false);
         return;
       }
-      setSucesso('Leitura registrada!');
-      setTimeout(() => router.push('/bombas'), 800);
+      setSucesso('Iniciante registrado! Lembre-se de fechar a leitura ao final do expediente.');
+      setTimeout(() => router.push('/bombas'), 1000);
     } catch (err) {
       setErro('Erro de conexao');
       setSalvando(false);
     }
   }
 
-  const consumo = (Number(form.encerrante) || 0) - (Number(form.iniciante) || 0);
-
   return (
     <Layout>
       <div className="card">
-        <h1>Nova leitura de bomba</h1>
+        <h1>Abrir leitura de bomba</h1>
+        <p className="muted">
+          Registre o <strong>iniciante</strong> e a foto no inicio do expediente.
+          O encerrante sera registrado depois, ao fechar a leitura.
+        </p>
         <form onSubmit={submit}>
           {erro && <div className="msg error">{erro}</div>}
           {sucesso && <div className="msg success">{sucesso}</div>}
@@ -90,32 +86,14 @@ export default function NovaLeitura() {
               <input type="number" step="0.01" min="0" required value={form.iniciante}
                 onChange={(e) => update('iniciante', e.target.value)} />
             </div>
-            <div className="col">
-              <label>Encerrante (L) *</label>
-              <input type="number" step="0.01" min="0" required value={form.encerrante}
-                onChange={(e) => update('encerrante', e.target.value)} />
-            </div>
           </div>
-          {consumo > 0 && (
-            <p className="muted">Consumo calculado: <strong>{consumo.toFixed(2)} L</strong></p>
-          )}
-          <div className="row" style={{ marginTop: 12 }}>
-            <div className="col">
-              <FotoCaptura
-                label="Foto do iniciante"
-                required
-                value={form.foto_iniciante}
-                onChange={(v) => update('foto_iniciante', v)}
-              />
-            </div>
-            <div className="col">
-              <FotoCaptura
-                label="Foto do encerrante"
-                required
-                value={form.foto_encerrante}
-                onChange={(v) => update('foto_encerrante', v)}
-              />
-            </div>
+          <div style={{ marginTop: 12 }}>
+            <FotoCaptura
+              label="Foto do iniciante"
+              required
+              value={form.foto_iniciante}
+              onChange={(v) => update('foto_iniciante', v)}
+            />
           </div>
           <div style={{ marginTop: 12 }}>
             <label>Observacao</label>
@@ -123,7 +101,7 @@ export default function NovaLeitura() {
           </div>
           <div className="btn-group" style={{ marginTop: 16 }}>
             <button type="submit" className="btn primary" disabled={salvando}>
-              {salvando ? 'Salvando...' : 'Salvar leitura'}
+              {salvando ? 'Salvando...' : 'Salvar iniciante'}
             </button>
             <button type="button" className="btn" onClick={() => router.push('/bombas')}>Cancelar</button>
           </div>

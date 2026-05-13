@@ -12,13 +12,18 @@ Webapp para controle de abastecimento de frota de onibus, com lancamento diario 
 
 ## Funcionalidades
 
-- Login com perfis **Administrador** e **Operador**
-- Aba **Abastecimento**: registra abastecimentos dos veiculos (odometro, diesel, arla32, foto do odometro), com scan obrigatorio do QRCode do veiculo
-- Aba **Bombas**: lancamento diario do **iniciante** e **encerrante** das bombas, com foto de cada leitura
+- Login com perfis **Administrador** e **Operador** (JWT em cookie HttpOnly)
+- Aba **Abastecimento**: registra abastecimentos dos veiculos (odometro, diesel, arla32, foto do odometro), com scan obrigatorio do QRCode do veiculo. Scanner usa `jsQR` (funciona em iOS Safari, Android, etc.) e tem fallback "tirar foto" + entrada manual.
+- Aba **Bombas**: fluxo em dois momentos:
+  - **Abrir leitura** no inicio do expediente (iniciante + foto)
+  - **Fechar leitura** no fim do expediente (encerrante + foto)
+  - **Alerta automatico** no topo da tela a cada 20 minutos quando ha leituras pendentes (com Notification API e som curto)
+- Aba **Relatorios**: resumo do periodo, consumo por veiculo (km/L), veiculos sem abastecer, consumo diario (30d) e conferencia bomba x abastecimentos
 - Modulo **Admin** (apenas administradores):
   - CRUD de veiculos com geracao de QRCode imprimivel
   - CRUD de bombas
   - CRUD de usuarios (admin/operador)
+- Datas e numeros formatados em pt-BR (timezone America/Sao_Paulo)
 - Fotos armazenadas no MySQL (LONGBLOB), servidas via endpoint autenticado
 
 ## Como rodar
@@ -95,6 +100,18 @@ docker compose exec mysql mysql -uroot -p${MYSQL_ROOT_PASSWORD} abastecimento  #
 docker compose down                  # para tudo (mantem dados)
 docker compose down -v               # para e apaga volume do BD
 ```
+
+## Migracao para BD existente
+
+Se voce ja tem um BD em uso (versao anterior do app, com iniciante + encerrante obrigatorios na mesma leitura), rode a migration uma vez:
+
+```bash
+docker compose exec -T mysql \
+  mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} \
+  < sql/migrations/001_separar_iniciante_encerrante.sql
+```
+
+Ela e idempotente para os campos novos mas falha se rodada duas vezes (FK duplicada). Rode somente uma vez.
 
 ## Diagnostico
 
