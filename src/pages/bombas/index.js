@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
-import { formatDate, formatDateTime, formatNumber } from '@/lib/format';
+import { formatDate, formatNumber } from '@/lib/format';
 
 export default function BombasLeituras() {
   const router = useRouter();
@@ -11,21 +11,40 @@ export default function BombasLeituras() {
   const [filtroBomba, setFiltroBomba] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('');
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
   const [verFoto, setVerFoto] = useState(null);
 
   async function load() {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (filtroBomba) params.set('bomba_id', filtroBomba);
-    if (filtroStatus) params.set('status', filtroStatus);
-    const r = await fetch('/api/leituras-bomba?' + params.toString());
-    const d = await r.json();
-    setRows(d.data || []);
-    setLoading(false);
+    setErro('');
+    try {
+      const params = new URLSearchParams();
+      if (filtroBomba) params.set('bomba_id', filtroBomba);
+      if (filtroStatus) params.set('status', filtroStatus);
+      const r = await fetch('/api/leituras-bomba?' + params.toString(), {
+        credentials: 'same-origin',
+      });
+      let d;
+      try { d = await r.json(); } catch (e) { d = {}; }
+      if (!r.ok) {
+        setErro(d.error || `Erro ${r.status} ao carregar leituras`);
+        setRows([]);
+      } else {
+        setRows(d.data || []);
+      }
+    } catch (err) {
+      setErro('Erro de conexao: ' + err.message);
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-    fetch('/api/bombas').then((r) => r.json()).then((d) => setBombas(d.data || []));
+    fetch('/api/bombas', { credentials: 'same-origin' })
+      .then((r) => r.json())
+      .then((d) => setBombas(d.data || []))
+      .catch(() => {});
   }, []);
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [filtroBomba, filtroStatus]);
@@ -62,11 +81,12 @@ export default function BombasLeituras() {
       </div>
 
       <div className="card">
+        {erro && <div className="msg error">{erro}</div>}
         {loading ? (
           <p className="muted">Carregando...</p>
-        ) : rows.length === 0 ? (
+        ) : rows.length === 0 && !erro ? (
           <p className="muted">Nenhuma leitura registrada.</p>
-        ) : (
+        ) : rows.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
             <table>
               <thead>
@@ -90,11 +110,7 @@ export default function BombasLeituras() {
                       <span className={`tag ${r.combustivel}`}>{r.combustivel}</span>
                     </td>
                     <td>
-                      {r.aberta ? (
-                        <span className="tag inativo">Aberta</span>
-                      ) : (
-                        <span className="tag ativo">Fechada</span>
-                      )}
+                      {r.aberta ? <span className="tag inativo">Aberta</span> : <span className="tag ativo">Fechada</span>}
                     </td>
                     <td>{formatNumber(r.iniciante)}</td>
                     <td>{r.encerrante == null ? '-' : formatNumber(r.encerrante)}</td>
@@ -132,7 +148,7 @@ export default function BombasLeituras() {
               </tbody>
             </table>
           </div>
-        )}
+        ) : null}
       </div>
 
       {verFoto && (
