@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useTheme } from '@/lib/useTheme';
 
 const ITEMS_BASE = [
   { href: '/abastecimento', label: 'Abastecimento', icon: 'A' },
@@ -13,6 +14,7 @@ const ITEMS_ADMIN = [
 
 export default function Sidebar({ user, branding, onLogout }) {
   const router = useRouter();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -32,10 +34,13 @@ export default function Sidebar({ user, branding, onLogout }) {
   useEffect(() => { setMobileOpen(false); }, [router.pathname]);
 
   const items = [...ITEMS_BASE, ...(user?.role === 'admin' ? ITEMS_ADMIN : [])];
-  const linkClass = (href) => router.pathname === href || router.pathname.startsWith(href + '/')
-    ? 'sidebar-link active' : 'sidebar-link';
+  const linkClass = (href) =>
+    router.pathname === href || router.pathname.startsWith(href + '/')
+      ? 'sidebar-link active' : 'sidebar-link';
 
   const nomeSistema = branding?.nome_sistema || 'Abastecimento';
+  const temaLabel = theme === 'dark' ? 'Claro' : 'Escuro';
+  const temaIcone = theme === 'dark' ? '☀' : '☾';
 
   return (
     <>
@@ -65,10 +70,6 @@ export default function Sidebar({ user, branding, onLogout }) {
             )}
             {!collapsed && <span className="sidebar-title">{nomeSistema}</span>}
           </div>
-          <button className="sidebar-collapse-btn" onClick={toggleCollapse}
-            title={collapsed ? 'Expandir' : 'Recolher'}>
-            {collapsed ? '»' : '«'}
-          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -87,8 +88,31 @@ export default function Sidebar({ user, branding, onLogout }) {
               <div className="sidebar-user-role">{user.role}</div>
             </div>
           )}
-          <button className="sidebar-logout" onClick={onLogout} title="Sair">
-            {collapsed ? '⇥' : 'Sair'}
+          <div className="sidebar-footer-actions">
+            <button
+              className="sidebar-btn"
+              onClick={toggleTheme}
+              title={`Mudar para tema ${temaLabel.toLowerCase()}`}
+            >
+              <span>{temaIcone}</span>
+              {!collapsed && <span>{temaLabel}</span>}
+            </button>
+            <button
+              className="sidebar-btn"
+              onClick={onLogout}
+              title="Sair"
+            >
+              {collapsed ? <span>⇥</span> : <span>Sair</span>}
+            </button>
+          </div>
+          <button
+            className="sidebar-btn full"
+            onClick={toggleCollapse}
+            title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+          >
+            <span>{collapsed ? '»' : '«'}</span>
+            {!collapsed && <span>Recolher</span>}
           </button>
         </div>
       </aside>

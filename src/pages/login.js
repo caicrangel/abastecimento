@@ -1,12 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useTheme } from '@/lib/useTheme';
 
 export default function Login() {
   const router = useRouter();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
+  const [branding, setBranding] = useState({ nome_sistema: 'Abastecimento', tem_logo: false });
+
+  useEffect(() => {
+    fetch('/api/settings/branding', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setBranding(d); })
+      .catch(() => {});
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
@@ -34,8 +44,29 @@ export default function Login() {
 
   return (
     <div className="login-page">
+      <button
+        type="button"
+        onClick={toggleTheme}
+        title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
+        style={{
+          position: 'absolute', top: 16, right: 16,
+          background: 'rgba(255,255,255,0.15)', color: '#fff',
+          border: '1px solid rgba(255,255,255,0.3)',
+          borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontSize: 14,
+        }}
+      >
+        {theme === 'dark' ? '☀ Claro' : '☾ Escuro'}
+      </button>
+
       <div className="login-card">
-        <h1 style={{ textAlign: 'center', marginBottom: 8 }}>Abastecimento</h1>
+        {branding.tem_logo ? (
+          <img
+            src={`/api/settings/logo?v=${branding.logo_updated_at || ''}`}
+            alt="logo"
+            className="login-logo"
+          />
+        ) : null}
+        <h1 style={{ textAlign: 'center', marginBottom: 4 }}>{branding.nome_sistema}</h1>
         <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>Controle de frota e bombas</p>
         <form onSubmit={submit}>
           {erro && <div className="msg error">{erro}</div>}
@@ -50,7 +81,7 @@ export default function Login() {
               required
             />
           </div>
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 20 }}>
             <label>Senha</label>
             <input
               type="password"
@@ -60,9 +91,16 @@ export default function Login() {
               required
             />
           </div>
-          <button type="submit" className="btn primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="submit"
+              className="btn primary"
+              style={{ minWidth: 160, padding: '10px 24px' }}
+              disabled={loading}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
