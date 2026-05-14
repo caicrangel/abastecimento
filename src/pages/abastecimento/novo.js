@@ -9,6 +9,8 @@ export default function NovoAbastecimento() {
   const [step, setStep] = useState('scan');
   const [veiculo, setVeiculo] = useState(null);
   const [bombas, setBombas] = useState([]);
+  const [operacao, setOperacao] = useState(null);
+  const [opLoading, setOpLoading] = useState(true);
   const [form, setForm] = useState({
     bomba_id: '',
     odometro: '',
@@ -22,6 +24,9 @@ export default function NovoAbastecimento() {
   const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
+    fetch('/api/operacoes/atual', { credentials: 'same-origin' })
+      .then((r) => r.json())
+      .then((d) => { setOperacao(d.data); setOpLoading(false); });
     fetch('/api/bombas').then((r) => r.json()).then((d) => {
       setBombas((d.data || []).filter((b) => b.ativo));
     });
@@ -88,6 +93,29 @@ export default function NovoAbastecimento() {
       setErro('Erro de conexao');
       setSalvando(false);
     }
+  }
+
+  if (opLoading) {
+    return <Layout><div className="card"><p className="muted">Carregando...</p></div></Layout>;
+  }
+
+  if (!operacao) {
+    return (
+      <Layout>
+        <div className="card">
+          <h1>Novo abastecimento</h1>
+          <div className="msg error">
+            Nenhuma operacao aberta. Inicie o abastecimento do dia (iniciante das bombas) antes de registrar abastecimentos.
+          </div>
+          <div className="btn-group">
+            <button className="btn success" onClick={() => router.push('/abastecimento/iniciar')}>
+              ▶ Iniciar abastecimento do dia
+            </button>
+            <button className="btn" onClick={() => router.push('/abastecimento')}>Voltar</button>
+          </div>
+        </div>
+      </Layout>
+    );
   }
 
   return (

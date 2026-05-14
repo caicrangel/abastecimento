@@ -35,6 +35,16 @@ async function handler(req, res) {
     return res.json({ data: rows });
   }
   if (req.method === 'POST') {
+    const operacao = await queryOne(
+      'SELECT id FROM operacoes WHERE encerrado_em IS NULL ORDER BY iniciado_em DESC LIMIT 1'
+    );
+    if (!operacao) {
+      return res.status(409).json({
+        error: 'Nenhuma operacao aberta. Inicie o abastecimento do dia antes de registrar abastecimentos.',
+        code: 'NO_OPEN_OPERATION',
+      });
+    }
+
     const {
       veiculo_id, bomba_id, data_abastecimento,
       odometro, qtd_diesel, qtd_arla32,
@@ -58,13 +68,14 @@ async function handler(req, res) {
     const data = data_abastecimento || new Date().toISOString().slice(0, 19).replace('T', ' ');
     const result = await query(
       `INSERT INTO abastecimentos
-        (veiculo_id, bomba_id, user_id, data_abastecimento,
+        (veiculo_id, bomba_id, user_id, operacao_id, data_abastecimento,
          odometro, qtd_diesel, qtd_arla32, foto_odometro, foto_odometro_mime, observacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         Number(veiculo_id),
         bomba_id ? Number(bomba_id) : null,
         req.user.id,
+        operacao.id,
         data,
         od,
         diesel,
@@ -74,7 +85,7 @@ async function handler(req, res) {
         observacao || null,
       ]
     );
-    return res.status(201).json({ id: result.insertId });
+    return res.status(201).json({ id: result.insertId, operacao_id: operacao.id });
   }
   return methodNotAllowed(res, ['GET', 'POST']);
 }

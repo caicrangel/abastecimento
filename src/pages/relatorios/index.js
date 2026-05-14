@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
-import { formatDate, formatDateTime, formatNumber, formatInt } from '@/lib/format';
+import { formatDate, formatDateTime, formatNumber, formatInt, formatDuracao } from '@/lib/format';
 
 const HOJE = new Date().toISOString().slice(0, 10);
 
@@ -24,21 +24,26 @@ export default function Relatorios() {
   const [semAbastecer, setSemAbastecer] = useState([]);
   const [consumoDiario, setConsumoDiario] = useState([]);
   const [conferencia, setConferencia] = useState([]);
+  const [operacoes, setOperacoes] = useState([]);
+  const [operacoesResumo, setOperacoesResumo] = useState(null);
 
   async function carregar() {
     const qs = `from=${from}&to=${to}`;
-    const [r1, r2, r3, r4, r5] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6] = await Promise.all([
       fetch(`/api/relatorios/resumo?${qs}`).then((r) => r.json()),
       fetch(`/api/relatorios/consumo-veiculo?${qs}`).then((r) => r.json()),
       fetch(`/api/relatorios/veiculos-sem-abastecer?dias=${dias}`).then((r) => r.json()),
       fetch(`/api/relatorios/consumo-diario?dias=30`).then((r) => r.json()),
       fetch(`/api/relatorios/conferencia-bombas?${qs}`).then((r) => r.json()),
+      fetch(`/api/relatorios/operacoes?${qs}`).then((r) => r.json()),
     ]);
     setResumo(r1);
     setConsumoVeiculo(r2.data || []);
     setSemAbastecer(r3.data || []);
     setConsumoDiario(r4.data || []);
     setConferencia(r5.data || []);
+    setOperacoes(r6.data || []);
+    setOperacoesResumo(r6.resumo || null);
   }
 
   useEffect(() => { carregar(); /* eslint-disable-next-line */ }, []);
@@ -86,6 +91,64 @@ export default function Relatorios() {
           </div>
         </>
       )}
+
+      {operacoesResumo && (
+        <>
+          <h2>Operacoes encerradas no periodo</h2>
+          <div className="row" style={{ marginBottom: 16 }}>
+            <Card titulo="Operacoes" valor={formatInt(operacoesResumo.total)} />
+            <Card titulo="Duracao media" valor={formatDuracao(operacoesResumo.duracao_media_min)} />
+            <Card titulo="Mais rapida" valor={formatDuracao(operacoesResumo.duracao_min_min)} />
+            <Card titulo="Mais demorada" valor={formatDuracao(operacoesResumo.duracao_max_min)} />
+          </div>
+        </>
+      )}
+
+      <div className="card">
+        <h2>Operacoes (historico do periodo)</h2>
+        {operacoes.length === 0 ? (
+          <p className="muted">Nenhuma operacao encerrada no periodo.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Inicio</th>
+                  <th>Fim</th>
+                  <th>Duracao</th>
+                  <th>Abastecimentos</th>
+                  <th>Tempo medio/carro</th>
+                  <th>Diesel (L)</th>
+                  <th>Arla32 (L)</th>
+                  <th>Vol. bombas (L)</th>
+                  <th>Operadores</th>
+                </tr>
+              </thead>
+              <tbody>
+                {operacoes.map((o) => (
+                  <tr key={o.id}>
+                    <td><strong>{formatDate(o.data)}</strong></td>
+                    <td>{formatDateTime(o.iniciado_em)}</td>
+                    <td>{formatDateTime(o.encerrado_em)}</td>
+                    <td><strong>{formatDuracao(o.duracao_min)}</strong></td>
+                    <td>{formatInt(o.qtd_abastecimentos)}</td>
+                    <td>{formatDuracao(o.tempo_medio_por_veiculo_min)}</td>
+                    <td>{formatNumber(o.total_diesel)}</td>
+                    <td>{formatNumber(o.total_arla32)}</td>
+                    <td>{formatNumber(o.volume_bombas)}</td>
+                    <td className="muted" style={{ fontSize: 12 }}>
+                      Ini: {o.iniciado_por_nome}
+                      {o.encerrado_por_nome && o.encerrado_por_nome !== o.iniciado_por_nome &&
+                        <><br/>Enc: {o.encerrado_por_nome}</>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="card">
         <h2>Consumo por veiculo (km/L)</h2>

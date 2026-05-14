@@ -33,11 +33,27 @@ CREATE TABLE IF NOT EXISTS veiculos (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS operacoes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  data DATE NOT NULL,
+  iniciado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  encerrado_em DATETIME NULL,
+  iniciado_por INT NOT NULL,
+  encerrado_por INT NULL,
+  observacao TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_op_iniciador FOREIGN KEY (iniciado_por) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_op_encerrador FOREIGN KEY (encerrado_por) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_op_aberta (encerrado_em),
+  INDEX idx_op_data (data)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS leituras_bomba (
   id INT AUTO_INCREMENT PRIMARY KEY,
   bomba_id INT NOT NULL,
   user_id INT NOT NULL,
   user_encerramento_id INT NULL,
+  operacao_id INT NULL,
   data_leitura DATE NOT NULL,
   data_inicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   data_encerramento DATETIME NULL,
@@ -52,9 +68,11 @@ CREATE TABLE IF NOT EXISTS leituras_bomba (
   CONSTRAINT fk_leitura_bomba FOREIGN KEY (bomba_id) REFERENCES bombas(id) ON DELETE RESTRICT,
   CONSTRAINT fk_leitura_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
   CONSTRAINT fk_leitura_user_enc FOREIGN KEY (user_encerramento_id) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_leitura_operacao FOREIGN KEY (operacao_id) REFERENCES operacoes(id) ON DELETE SET NULL,
   INDEX idx_leitura_data (data_leitura),
   INDEX idx_leitura_bomba (bomba_id),
-  INDEX idx_leitura_aberta (encerrante)
+  INDEX idx_leitura_aberta (encerrante),
+  INDEX idx_leitura_op (operacao_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS abastecimentos (
@@ -62,6 +80,7 @@ CREATE TABLE IF NOT EXISTS abastecimentos (
   veiculo_id INT NOT NULL,
   bomba_id INT,
   user_id INT NOT NULL,
+  operacao_id INT NULL,
   data_abastecimento DATETIME NOT NULL,
   odometro INT NOT NULL,
   qtd_diesel DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -73,8 +92,10 @@ CREATE TABLE IF NOT EXISTS abastecimentos (
   CONSTRAINT fk_abast_veiculo FOREIGN KEY (veiculo_id) REFERENCES veiculos(id) ON DELETE RESTRICT,
   CONSTRAINT fk_abast_bomba FOREIGN KEY (bomba_id) REFERENCES bombas(id) ON DELETE SET NULL,
   CONSTRAINT fk_abast_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_abast_operacao FOREIGN KEY (operacao_id) REFERENCES operacoes(id) ON DELETE SET NULL,
   INDEX idx_abast_data (data_abastecimento),
-  INDEX idx_abast_veiculo (veiculo_id)
+  INDEX idx_abast_veiculo (veiculo_id),
+  INDEX idx_abast_op (operacao_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

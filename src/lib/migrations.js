@@ -74,14 +74,74 @@ async function migration001() {
   }
 }
 
-export async function runMigrations() {
-  const tabelaExiste = await queryOne(
+async function tableExists(name) {
+  const r = await queryOne(
     `SELECT COUNT(*) AS c FROM information_schema.tables
-      WHERE table_schema = DATABASE() AND table_name = 'leituras_bomba'`
+      WHERE table_schema = DATABASE() AND table_name = ?`,
+    [name]
   );
-  if (!tabelaExiste || !tabelaExiste.c) {
+  return r && Number(r.c) > 0;
+}
+
+async function migration002() {
+  const m = 'migration 002 (operacoes do dia)';
+
+  if (!(await tableExists('operacoes'))) {
+    log.info(`${m}: criando tabela operacoes`);
+    await query(`
+      CREATE TABLE operacoes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        data DATE NOT NULL,
+        iniciado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        encerrado_em DATETIME NULL,
+        iniciado_por INT NOT NULL,
+        encerrado_por INT NULL,
+        observacao TEXT,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_op_iniciador FOREIGN KEY (iniciado_por) REFERENCES users(id) ON DELETE RESTRICT,
+        CONSTRAINT fk_op_encerrador FOREIGN KEY (encerrado_por) REFERENCES users(id) ON DELETE SET NULL,
+        INDEX idx_op_aberta (encerrado_em),
+        INDEX idx_op_data (data)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+  }
+
+  if (!(await columnExists('leituras_bomba', 'operacao_id'))) {
+    log.info(`${m}: adicionando operacao_id em leituras_bomba`);
+    await query('ALTER TABLE leituras_bomba ADD COLUMN operacao_id INT NULL AFTER user_encerramento_id');
+  }
+  if (!(await fkExists('leituras_bomba', 'fk_leitura_operacao'))) {
+    await query(
+      `ALTER TABLE leituras_bomba
+         ADD CONSTRAINT fk_leitura_operacao
+         FOREIGN KEY (operacao_id) REFERENCES operacoes(id) ON DELETE SET NULL`
+    );
+  }
+  if (!(await indexExists('leituras_bomba', 'idx_leitura_op'))) {
+    await query('ALTER TABLE leituras_bomba ADD INDEX idx_leitura_op (operacao_id)');
+  }
+
+  if (!(await columnExists('abastecimentos', 'operacao_id'))) {
+    log.info(`${m}: adicionando operacao_id em abastecimentos`);
+    await query('ALTER TABLE abastecimentos ADD COLUMN operacao_id INT NULL AFTER user_id');
+  }
+  if (!(await fkExists('abastecimentos', 'fk_abast_operacao'))) {
+    await query(
+      `ALTER TABLE abastecimentos
+         ADD CONSTRAINT fk_abast_operacao
+         FOREIGN KEY (operacao_id) REFERENCES operacoes(id) ON DELETE SET NULL`
+    );
+  }
+  if (!(await indexExists('abastecimentos', 'idx_abast_op'))) {
+    await query('ALTER TABLE abastecimentos ADD INDEX idx_abast_op (operacao_id)');
+  }
+}
+
+export async function runMigrations() {
+  if (!(await tableExists('leituras_bomba'))) {
     log.warn('migrations: tabela leituras_bomba ainda nao existe, pulando');
     return;
   }
   await migration001();
+  await migration002();
 }

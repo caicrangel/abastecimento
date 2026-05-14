@@ -44,3 +44,14 @@ export function formatInt(value) {
 export function timestampPtBR() {
   return new Date().toLocaleString(LOCALE, { timeZone: TZ, hour12: false });
 }
+
+export function formatDuracao(min) {
+  if (min == null || min === '') return '-';
+  const n = Math.round(Number(min));
+  if (Number.isNaN(n)) return '-';
+  const h = Math.floor(n / 60);
+  const m = n % 60;
+  if (h === 0) return `${m}min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}min`;
+}
