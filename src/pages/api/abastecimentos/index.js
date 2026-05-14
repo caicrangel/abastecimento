@@ -10,12 +10,13 @@ export const config = {
 
 async function handler(req, res) {
   if (req.method === 'GET') {
-    const { from, to, veiculo_id } = req.query;
+    const { from, to, veiculo_id, operacao_id } = req.query;
     const where = [];
     const params = [];
     if (from) { where.push('a.data_abastecimento >= ?'); params.push(from + ' 00:00:00'); }
     if (to) { where.push('a.data_abastecimento <= ?'); params.push(to + ' 23:59:59'); }
     if (veiculo_id) { where.push('a.veiculo_id = ?'); params.push(Number(veiculo_id)); }
+    if (operacao_id) { where.push('a.operacao_id = ?'); params.push(Number(operacao_id)); }
     const sql = `
       SELECT a.id, a.data_abastecimento, a.odometro, a.qtd_diesel, a.qtd_arla32,
              a.observacao, a.created_at,
