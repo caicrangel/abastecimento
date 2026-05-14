@@ -159,6 +159,16 @@ async function migration003() {
   }
 }
 
+async function migration004() {
+  const m = 'migration 004 (logos claro/escuro)';
+  const antigo = await queryOne("SELECT chave FROM settings WHERE chave = 'logo'");
+  if (antigo) {
+    log.info(`${m}: renomeando 'logo' para 'logo_light'`);
+    await query("DELETE FROM settings WHERE chave = 'logo_light'");
+    await query("UPDATE settings SET chave = 'logo_light' WHERE chave = 'logo'");
+  }
+}
+
 export async function runMigrations() {
   if (!(await tableExists('leituras_bomba'))) {
     log.warn('migrations: tabela leituras_bomba ainda nao existe, pulando');
@@ -167,4 +177,5 @@ export async function runMigrations() {
   await migration001();
   await migration002();
   await migration003();
+  await migration004();
 }

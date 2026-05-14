@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTheme } from '@/lib/useTheme';
+import { IconSun, IconMoon } from '@/components/Icons';
 
 export default function Login() {
   const router = useRouter();
@@ -9,7 +10,11 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
-  const [branding, setBranding] = useState({ nome_sistema: 'Abastecimento', tem_logo: false });
+  const [branding, setBranding] = useState({
+    nome_sistema: 'Abastecimento',
+    tem_logo_light: false, tem_logo_dark: false,
+    logo_light_updated_at: null, logo_dark_updated_at: null,
+  });
 
   useEffect(() => {
     fetch('/api/settings/branding', { credentials: 'same-origin' })
@@ -42,30 +47,32 @@ export default function Login() {
     }
   }
 
+  const temLogo = theme === 'dark'
+    ? branding.tem_logo_dark || branding.tem_logo_light
+    : branding.tem_logo_light || branding.tem_logo_dark;
+  const logoUpdatedAt = theme === 'dark'
+    ? branding.logo_dark_updated_at || branding.logo_light_updated_at
+    : branding.logo_light_updated_at || branding.logo_dark_updated_at;
+  const logoSrc = temLogo
+    ? `/api/settings/logo?theme=${theme}&v=${logoUpdatedAt || ''}`
+    : null;
+
   return (
     <div className="login-page">
       <button
         type="button"
         onClick={toggleTheme}
         title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
-        style={{
-          position: 'absolute', top: 16, right: 16,
-          background: 'rgba(255,255,255,0.15)', color: '#fff',
-          border: '1px solid rgba(255,255,255,0.3)',
-          borderRadius: 6, padding: '6px 12px', cursor: 'pointer', fontSize: 14,
-        }}
+        className="login-theme-toggle"
       >
-        {theme === 'dark' ? '☀ Claro' : '☾ Escuro'}
+        {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+        <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
       </button>
 
       <div className="login-card">
-        {branding.tem_logo ? (
-          <img
-            src={`/api/settings/logo?v=${branding.logo_updated_at || ''}`}
-            alt="logo"
-            className="login-logo"
-          />
-        ) : null}
+        {logoSrc && (
+          <img src={logoSrc} alt={branding.nome_sistema} className="login-logo" />
+        )}
         <h1 style={{ textAlign: 'center', marginBottom: 4 }}>{branding.nome_sistema}</h1>
         <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>Controle de frota e bombas</p>
         <form onSubmit={submit}>
@@ -95,7 +102,7 @@ export default function Login() {
             <button
               type="submit"
               className="btn primary"
-              style={{ minWidth: 160, padding: '10px 24px' }}
+              style={{ minWidth: 180, padding: '10px 24px' }}
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar'}

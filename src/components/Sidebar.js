@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@/lib/useTheme';
+import { IconSun, IconMoon, IconChevronLeft, IconChevronRight, IconLogout } from './Icons';
 
 const ITEMS_BASE = [
   { href: '/abastecimento', label: 'Abastecimento', icon: 'A' },
@@ -39,8 +40,15 @@ export default function Sidebar({ user, branding, onLogout }) {
       ? 'sidebar-link active' : 'sidebar-link';
 
   const nomeSistema = branding?.nome_sistema || 'Abastecimento';
-  const temaLabel = theme === 'dark' ? 'Claro' : 'Escuro';
-  const temaIcone = theme === 'dark' ? '☀' : '☾';
+  const temLogoNoTema = theme === 'dark'
+    ? branding?.tem_logo_dark || branding?.tem_logo_light
+    : branding?.tem_logo_light || branding?.tem_logo_dark;
+  const logoUpdatedAt = theme === 'dark'
+    ? branding?.logo_dark_updated_at || branding?.logo_light_updated_at
+    : branding?.logo_light_updated_at || branding?.logo_dark_updated_at;
+  const logoSrc = temLogoNoTema
+    ? `/api/settings/logo?theme=${theme}&v=${logoUpdatedAt || ''}`
+    : null;
 
   return (
     <>
@@ -59,12 +67,8 @@ export default function Sidebar({ user, branding, onLogout }) {
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-brand">
-            {branding?.tem_logo ? (
-              <img
-                src={`/api/settings/logo?v=${branding.logo_updated_at || ''}`}
-                alt="logo"
-                className="sidebar-logo"
-              />
+            {logoSrc ? (
+              <img src={logoSrc} alt="logo" className="sidebar-logo" />
             ) : (
               <div className="sidebar-logo-placeholder">{nomeSistema.charAt(0).toUpperCase()}</div>
             )}
@@ -92,17 +96,14 @@ export default function Sidebar({ user, branding, onLogout }) {
             <button
               className="sidebar-btn"
               onClick={toggleTheme}
-              title={`Mudar para tema ${temaLabel.toLowerCase()}`}
+              title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
             >
-              <span>{temaIcone}</span>
-              {!collapsed && <span>{temaLabel}</span>}
+              {theme === 'dark' ? <IconSun /> : <IconMoon />}
+              {!collapsed && <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>}
             </button>
-            <button
-              className="sidebar-btn"
-              onClick={onLogout}
-              title="Sair"
-            >
-              {collapsed ? <span>⇥</span> : <span>Sair</span>}
+            <button className="sidebar-btn" onClick={onLogout} title="Sair">
+              <IconLogout />
+              {!collapsed && <span>Sair</span>}
             </button>
           </div>
           <button
@@ -111,7 +112,7 @@ export default function Sidebar({ user, branding, onLogout }) {
             title={collapsed ? 'Expandir menu' : 'Recolher menu'}
             aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
           >
-            <span>{collapsed ? '»' : '«'}</span>
+            {collapsed ? <IconChevronRight /> : <IconChevronLeft />}
             {!collapsed && <span>Recolher</span>}
           </button>
         </div>
