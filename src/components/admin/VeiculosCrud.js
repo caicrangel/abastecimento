@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import Layout from '@/components/Layout';
 
 const VAZIO = { id: null, prefixo: '', placa: '', modelo: '', ativo: true };
 
-export default function AdminVeiculos() {
+export default function VeiculosCrud() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(null);
@@ -12,12 +11,11 @@ export default function AdminVeiculos() {
 
   async function load() {
     setLoading(true);
-    const r = await fetch('/api/veiculos');
+    const r = await fetch('/api/veiculos', { credentials: 'same-origin' });
     const d = await r.json();
     setRows(d.data || []);
     setLoading(false);
   }
-
   useEffect(() => { load(); }, []);
 
   function novo() { setEditando({ ...VAZIO }); setErro(''); }
@@ -29,70 +27,57 @@ export default function AdminVeiculos() {
     const method = editando.id ? 'PUT' : 'POST';
     const url = editando.id ? `/api/veiculos/${editando.id}` : '/api/veiculos';
     const r = await fetch(url, {
-      method,
+      method, credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editando),
     });
     const d = await r.json();
     if (!r.ok) { setErro(d.error || 'Falha ao salvar'); return; }
-    setEditando(null);
-    await load();
+    setEditando(null); await load();
   }
 
   async function excluir(v) {
     if (!confirm(`Excluir veiculo ${v.prefixo}?`)) return;
-    const r = await fetch(`/api/veiculos/${v.id}`, { method: 'DELETE' });
+    const r = await fetch(`/api/veiculos/${v.id}`, { method: 'DELETE', credentials: 'same-origin' });
     const d = await r.json();
     if (!r.ok) { alert(d.error || 'Falha ao excluir'); return; }
     await load();
   }
 
   return (
-    <Layout>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h1 style={{ margin: 0 }}>Veiculos</h1>
-          <button className="btn primary" onClick={novo}>+ Novo veiculo</button>
-        </div>
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>Veiculos</h2>
+        <button className="btn primary" onClick={novo}>+ Novo veiculo</button>
       </div>
-
-      <div className="card">
-        {loading ? <p className="muted">Carregando...</p> : (
-          <div style={{ overflowX: 'auto' }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Prefixo</th>
-                  <th>Placa</th>
-                  <th>Modelo</th>
-                  <th>Status</th>
-                  <th>Acoes</th>
+      {loading ? <p className="muted">Carregando...</p> : (
+        <div style={{ overflowX: 'auto' }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Prefixo</th><th>Placa</th><th>Modelo</th><th>Status</th><th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((v) => (
+                <tr key={v.id}>
+                  <td><strong>{v.prefixo}</strong></td>
+                  <td>{v.placa || '-'}</td>
+                  <td>{v.modelo || '-'}</td>
+                  <td><span className={`tag ${v.ativo ? 'ativo' : 'inativo'}`}>{v.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                  <td>
+                    <div className="btn-group">
+                      <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => setQrcode(v)}>QR</button>
+                      <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => editar(v)}>Editar</button>
+                      <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => excluir(v)}>Excluir</button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((v) => (
-                  <tr key={v.id}>
-                    <td><strong>{v.prefixo}</strong></td>
-                    <td>{v.placa || '-'}</td>
-                    <td>{v.modelo || '-'}</td>
-                    <td><span className={`tag ${v.ativo ? 'ativo' : 'inativo'}`}>{v.ativo ? 'Ativo' : 'Inativo'}</span></td>
-                    <td>
-                      <div className="btn-group">
-                        <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => setQrcode(v)}>QR</button>
-                        <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => editar(v)}>Editar</button>
-                        <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => excluir(v)}>Excluir</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {editando && (
         <div className="modal-bg" onClick={() => setEditando(null)}>
@@ -118,8 +103,7 @@ export default function AdminVeiculos() {
               <div style={{ marginBottom: 14 }}>
                 <label>
                   <input type="checkbox" checked={editando.ativo}
-                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} />
-                  {' '}Ativo
+                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} /> Ativo
                 </label>
               </div>
               <div className="btn-group">
@@ -149,6 +133,6 @@ export default function AdminVeiculos() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }

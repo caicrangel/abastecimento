@@ -75,6 +75,14 @@ CREATE TABLE IF NOT EXISTS leituras_bomba (
   INDEX idx_leitura_op (operacao_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS settings (
+  chave VARCHAR(50) NOT NULL PRIMARY KEY,
+  valor_texto TEXT,
+  valor_blob LONGBLOB,
+  valor_mime VARCHAR(50),
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS abastecimentos (
   id INT AUTO_INCREMENT PRIMARY KEY,
   veiculo_id INT NOT NULL,

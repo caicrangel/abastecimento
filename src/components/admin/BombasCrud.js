@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import Layout from '@/components/Layout';
 
 const VAZIO = { id: null, codigo: '', descricao: '', combustivel: 'diesel', ativo: true };
 
-export default function AdminBombas() {
+export default function BombasCrud() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(null);
@@ -11,12 +10,11 @@ export default function AdminBombas() {
 
   async function load() {
     setLoading(true);
-    const r = await fetch('/api/bombas');
+    const r = await fetch('/api/bombas', { credentials: 'same-origin' });
     const d = await r.json();
     setRows(d.data || []);
     setLoading(false);
   }
-
   useEffect(() => { load(); }, []);
 
   function novo() { setEditando({ ...VAZIO }); setErro(''); }
@@ -28,68 +26,54 @@ export default function AdminBombas() {
     const method = editando.id ? 'PUT' : 'POST';
     const url = editando.id ? `/api/bombas/${editando.id}` : '/api/bombas';
     const r = await fetch(url, {
-      method,
+      method, credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editando),
     });
     const d = await r.json();
     if (!r.ok) { setErro(d.error || 'Falha ao salvar'); return; }
-    setEditando(null);
-    await load();
+    setEditando(null); await load();
   }
 
   async function excluir(b) {
     if (!confirm(`Excluir bomba ${b.codigo}?`)) return;
-    const r = await fetch(`/api/bombas/${b.id}`, { method: 'DELETE' });
+    const r = await fetch(`/api/bombas/${b.id}`, { method: 'DELETE', credentials: 'same-origin' });
     const d = await r.json();
     if (!r.ok) { alert(d.error || 'Falha ao excluir'); return; }
     await load();
   }
 
   return (
-    <Layout>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h1 style={{ margin: 0 }}>Cadastro de bombas</h1>
-          <button className="btn primary" onClick={novo}>+ Nova bomba</button>
-        </div>
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>Bombas</h2>
+        <button className="btn primary" onClick={novo}>+ Nova bomba</button>
       </div>
-
-      <div className="card">
-        {loading ? <p className="muted">Carregando...</p> : (
-          <div style={{ overflowX: 'auto' }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Codigo</th>
-                  <th>Descricao</th>
-                  <th>Combustivel</th>
-                  <th>Status</th>
-                  <th>Acoes</th>
+      {loading ? <p className="muted">Carregando...</p> : (
+        <div style={{ overflowX: 'auto' }}>
+          <table>
+            <thead>
+              <tr><th>Codigo</th><th>Descricao</th><th>Combustivel</th><th>Status</th><th>Acoes</th></tr>
+            </thead>
+            <tbody>
+              {rows.map((b) => (
+                <tr key={b.id}>
+                  <td><strong>{b.codigo}</strong></td>
+                  <td>{b.descricao || '-'}</td>
+                  <td><span className={`tag ${b.combustivel}`}>{b.combustivel}</span></td>
+                  <td><span className={`tag ${b.ativo ? 'ativo' : 'inativo'}`}>{b.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                  <td>
+                    <div className="btn-group">
+                      <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => editar(b)}>Editar</button>
+                      <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => excluir(b)}>Excluir</button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((b) => (
-                  <tr key={b.id}>
-                    <td><strong>{b.codigo}</strong></td>
-                    <td>{b.descricao || '-'}</td>
-                    <td><span className={`tag ${b.combustivel}`}>{b.combustivel}</span></td>
-                    <td><span className={`tag ${b.ativo ? 'ativo' : 'inativo'}`}>{b.ativo ? 'Ativo' : 'Inativo'}</span></td>
-                    <td>
-                      <div className="btn-group">
-                        <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => editar(b)}>Editar</button>
-                        <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => excluir(b)}>Excluir</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {editando && (
         <div className="modal-bg" onClick={() => setEditando(null)}>
@@ -118,8 +102,7 @@ export default function AdminBombas() {
               <div style={{ marginBottom: 14 }}>
                 <label>
                   <input type="checkbox" checked={editando.ativo}
-                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} />
-                  {' '}Ativo
+                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} /> Ativo
                 </label>
               </div>
               <div className="btn-group">
@@ -130,6 +113,6 @@ export default function AdminBombas() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }

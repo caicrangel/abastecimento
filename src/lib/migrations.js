@@ -137,6 +137,28 @@ async function migration002() {
   }
 }
 
+async function migration003() {
+  const m = 'migration 003 (settings)';
+  if (!(await tableExists('settings'))) {
+    log.info(`${m}: criando tabela settings`);
+    await query(`
+      CREATE TABLE settings (
+        chave VARCHAR(50) NOT NULL PRIMARY KEY,
+        valor_texto TEXT,
+        valor_blob LONGBLOB,
+        valor_mime VARCHAR(50),
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+  }
+  const nome = await queryOne('SELECT chave FROM settings WHERE chave = ?', ['nome_sistema']);
+  if (!nome) {
+    await query(
+      "INSERT INTO settings (chave, valor_texto) VALUES ('nome_sistema', 'Abastecimento')"
+    );
+  }
+}
+
 export async function runMigrations() {
   if (!(await tableExists('leituras_bomba'))) {
     log.warn('migrations: tabela leituras_bomba ainda nao existe, pulando');
@@ -144,4 +166,5 @@ export async function runMigrations() {
   }
   await migration001();
   await migration002();
+  await migration003();
 }

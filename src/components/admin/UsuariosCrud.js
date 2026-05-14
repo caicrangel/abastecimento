@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import Layout from '@/components/Layout';
 
 const VAZIO = { id: null, username: '', nome: '', role: 'operador', password: '', ativo: true };
 
-export default function AdminUsuarios() {
+export default function UsuariosCrud() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(null);
@@ -11,12 +10,11 @@ export default function AdminUsuarios() {
 
   async function load() {
     setLoading(true);
-    const r = await fetch('/api/usuarios');
+    const r = await fetch('/api/usuarios', { credentials: 'same-origin' });
     const d = await r.json();
     setRows(d.data || []);
     setLoading(false);
   }
-
   useEffect(() => { load(); }, []);
 
   function novo() { setEditando({ ...VAZIO }); setErro(''); }
@@ -28,68 +26,54 @@ export default function AdminUsuarios() {
     const method = editando.id ? 'PUT' : 'POST';
     const url = editando.id ? `/api/usuarios/${editando.id}` : '/api/usuarios';
     const r = await fetch(url, {
-      method,
+      method, credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editando),
     });
     const d = await r.json();
     if (!r.ok) { setErro(d.error || 'Falha ao salvar'); return; }
-    setEditando(null);
-    await load();
+    setEditando(null); await load();
   }
 
   async function excluir(u) {
     if (!confirm(`Excluir usuario ${u.username}?`)) return;
-    const r = await fetch(`/api/usuarios/${u.id}`, { method: 'DELETE' });
+    const r = await fetch(`/api/usuarios/${u.id}`, { method: 'DELETE', credentials: 'same-origin' });
     const d = await r.json();
     if (!r.ok) { alert(d.error || 'Falha ao excluir'); return; }
     await load();
   }
 
   return (
-    <Layout>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h1 style={{ margin: 0 }}>Usuarios</h1>
-          <button className="btn primary" onClick={novo}>+ Novo usuario</button>
-        </div>
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>Usuarios</h2>
+        <button className="btn primary" onClick={novo}>+ Novo usuario</button>
       </div>
-
-      <div className="card">
-        {loading ? <p className="muted">Carregando...</p> : (
-          <div style={{ overflowX: 'auto' }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Usuario</th>
-                  <th>Nome</th>
-                  <th>Perfil</th>
-                  <th>Status</th>
-                  <th>Acoes</th>
+      {loading ? <p className="muted">Carregando...</p> : (
+        <div style={{ overflowX: 'auto' }}>
+          <table>
+            <thead>
+              <tr><th>Usuario</th><th>Nome</th><th>Perfil</th><th>Status</th><th>Acoes</th></tr>
+            </thead>
+            <tbody>
+              {rows.map((u) => (
+                <tr key={u.id}>
+                  <td><strong>{u.username}</strong></td>
+                  <td>{u.nome}</td>
+                  <td><span className={`tag ${u.role}`}>{u.role}</span></td>
+                  <td><span className={`tag ${u.ativo ? 'ativo' : 'inativo'}`}>{u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                  <td>
+                    <div className="btn-group">
+                      <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => editar(u)}>Editar</button>
+                      <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }} onClick={() => excluir(u)}>Excluir</button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((u) => (
-                  <tr key={u.id}>
-                    <td><strong>{u.username}</strong></td>
-                    <td>{u.nome}</td>
-                    <td><span className={`tag ${u.role}`}>{u.role}</span></td>
-                    <td><span className={`tag ${u.ativo ? 'ativo' : 'inativo'}`}>{u.ativo ? 'Ativo' : 'Inativo'}</span></td>
-                    <td>
-                      <div className="btn-group">
-                        <button className="btn" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => editar(u)}>Editar</button>
-                        <button className="btn danger" style={{ padding: '3px 8px', fontSize: 12 }}
-                          onClick={() => excluir(u)}>Excluir</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {editando && (
         <div className="modal-bg" onClick={() => setEditando(null)}>
@@ -124,8 +108,7 @@ export default function AdminUsuarios() {
               <div style={{ marginBottom: 14 }}>
                 <label>
                   <input type="checkbox" checked={editando.ativo}
-                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} />
-                  {' '}Ativo
+                    onChange={(e) => setEditando({ ...editando, ativo: e.target.checked })} /> Ativo
                 </label>
               </div>
               <div className="btn-group">
@@ -136,6 +119,6 @@ export default function AdminUsuarios() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }
