@@ -101,6 +101,67 @@ docker compose down                  # para tudo (mantem dados)
 docker compose down -v               # para e apaga volume do BD
 ```
 
+## HTTPS local para teste de camera
+
+A camera ao vivo (`getUserMedia`) **so funciona em HTTPS** ou em `localhost`. Em HTTP puro o navegador bloqueia. Para testar a leitura de QRCode no celular, precisamos servir o app por HTTPS.
+
+A stack ja vem com um overlay pronto usando Caddy. Tres caminhos:
+
+### A. Self-signed (mais rapido, sem precisar de dominio)
+
+Caddy gera um certificado interno automaticamente. O navegador vai mostrar aviso de seguranca e voce aceita.
+
+```bash
+# 1) Copie o template do Caddyfile
+cp caddy/Caddyfile.example caddy/Caddyfile
+# (o exemplo ja vem configurado com 'tls internal' no cenario 2)
+
+# 2) No .env, ative o cookie seguro
+echo "COOKIE_SECURE=true" >> .env
+
+# 3) Suba com o overlay
+docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
+
+# 4) Acesse https://SEU_IP/ (no PC e no celular na mesma rede)
+#    Aceite o aviso "Continuar mesmo assim"
+```
+
+### B. Certificado da empresa (.crt + .key ja prontos)
+
+```bash
+# Coloque os arquivos em ./certs/
+#   certs/fullchain.crt
+#   certs/privkey.key
+
+# Edite caddy/Caddyfile e descomente o "Cenario 1" com o seu dominio:
+#   abastecimento.suaempresa.com.br {
+#     tls /certs/fullchain.crt /certs/privkey.key
+#     reverse_proxy app:3000
+#   }
+
+# Aponte o DNS ou /etc/hosts do celular para o IP do servidor
+docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
+```
+
+### C. Certificado da empresa em .pfx (com senha)
+
+Extraia em .crt + .key antes:
+
+```bash
+# Substitua "SUA_SENHA" pela senha do PFX
+openssl pkcs12 -in cert.pfx -clcerts -nokeys \
+  -passin pass:SUA_SENHA -out certs/fullchain.crt
+
+openssl pkcs12 -in cert.pfx -nocerts -nodes \
+  -passin pass:SUA_SENHA -out certs/privkey.key
+
+chmod 600 certs/privkey.key
+```
+
+Depois siga o "Cenario B" acima.
+
+> **No celular**: para o cert self-signed (cenario A), abra a URL e aceite o aviso. Para cert proprio (cenarios B/C), se o certificado for emitido por uma CA confiavel publica (Let's Encrypt, DigiCert, etc.) funciona direto. Se for cert interno da empresa, instale a CA raiz no celular.
+
 ## Migracao para BD existente
 
 Se voce ja tem um BD em uso (versao anterior do app, com iniciante + encerrante obrigatorios na mesma leitura), rode a migration uma vez:

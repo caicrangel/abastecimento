@@ -1,0 +1,32 @@
+# Overlay para habilitar HTTPS com Caddy na frente do app.
+#
+# Como usar:
+#   1. Copie caddy/Caddyfile.example para caddy/Caddyfile e ajuste.
+#   2. Se for usar certificado proprio, coloque em ./certs/ (fullchain.crt + privkey.key).
+#   3. No .env, defina COOKIE_SECURE=true e (opcional) remova/comente APP_PORT.
+#   4. Rode:  docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
+#
+# Apos isso o app fica acessivel em https://<host>/ pela porta 443 (e 80 redireciona).
+
+services:
+  app:
+    ports: !reset []
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: abastecimento-caddy
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:

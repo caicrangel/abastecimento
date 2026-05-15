@@ -1,0 +1,26 @@
+# Caddyfile - HTTPS reverse proxy para o app
+# Copie para caddy/Caddyfile e ajuste o host conforme o cenario.
+
+# ====================================================================
+# Cenario 1: certificado da empresa (.crt + .key) em ./certs/
+# Use o dominio que esta no certificado, ex: abastecimento.suaempresa.com.br
+# ====================================================================
+# abastecimento.suaempresa.com.br {
+#     tls /certs/fullchain.crt /certs/privkey.key
+#     reverse_proxy app:3000
+# }
+
+# ====================================================================
+# Cenario 2: acesso por IP/host local com certificado self-signed
+# Caddy gera o certificado automaticamente. O navegador vai avisar que
+# nao confia - aceite "Continuar mesmo assim" no primeiro acesso.
+# ====================================================================
+:443 {
+    tls internal
+    reverse_proxy app:3000
+}
+
+# Redireciona HTTP para HTTPS
+:80 {
+    redir https://{host}{uri} permanent
+}

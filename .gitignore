@@ -11,6 +11,15 @@ build
 # misc
 .DS_Store
 *.pem
+*.pfx
+*.p12
+
+# certificados (mantemos a pasta via .gitkeep, mas nao os arquivos)
+certs/*
+!certs/.gitkeep
+
+# Caddyfile real (mantemos so o .example)
+caddy/Caddyfile
 
 # debug
 npm-debug.log*
