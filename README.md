@@ -107,37 +107,50 @@ A camera ao vivo (`getUserMedia`) **so funciona em HTTPS** ou em `localhost`. Em
 
 A stack ja vem com um overlay pronto usando Caddy. Tres caminhos:
 
-### A. Self-signed (mais rapido, sem precisar de dominio)
+### A. Self-signed para um IP local (mais comum em rede interna)
 
-Caddy gera um certificado interno automaticamente. O navegador vai mostrar aviso de seguranca e voce aceita.
+Caddy precisa de um certificado real para servir HTTPS. Como `tls internal` nao emite cert valido para acesso direto por IP, geramos um cert self-signed com openssl para o IP que voce vai usar.
 
 ```bash
-# 1) IMPORTANTE: copie o template do Caddyfile ANTES de subir o compose.
-#    Sem este passo o Docker cria um diretorio vazio chamado 'Caddyfile'
-#    e o container nao inicia.
+# 1) Defina o IP (substitua pelo IP da sua VPS na rede)
+IP=10.0.0.150
+
+# 2) Gere o certificado self-signed com SAN do IP
+openssl req -x509 -newkey rsa:2048 -nodes \
+  -keyout certs/privkey.key \
+  -out certs/fullchain.crt \
+  -days 365 \
+  -subj "/CN=$IP" \
+  -addext "subjectAltName=IP:$IP,IP:127.0.0.1,DNS:localhost"
+
+chmod 600 certs/privkey.key
+
+# 3) Copie o template do Caddyfile
 cp caddy/Caddyfile.example caddy/Caddyfile
 
-# 2) Confirme que e um arquivo (e nao um diretorio):
+# 4) Confirme que e um arquivo (e nao um diretorio)
 ls -la caddy/Caddyfile
 
-# 3) No .env, ative o cookie seguro
-echo "COOKIE_SECURE=true" >> .env
+# 5) Ative o cookie seguro
+grep -q '^COOKIE_SECURE=' .env && sed -i 's/^COOKIE_SECURE=.*/COOKIE_SECURE=true/' .env || echo "COOKIE_SECURE=true" >> .env
 
-# 4) Suba com o overlay
+# 6) Suba com o overlay
 docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
 
-# 5) Acesse https://SEU_IP/ (no PC e no celular na mesma rede)
-#    Aceite o aviso "Continuar mesmo assim"
+# 7) Acesse https://10.0.0.150/ (no PC e no celular na mesma rede)
+#    Aceite o aviso "Sua conexao nao e particular" -> "Continuar mesmo assim".
 ```
 
 **Se errar a ordem e ver "not a directory: Are you trying to mount a directory onto a file":**
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.https.yml down
-rm -rf caddy/Caddyfile         # remove o diretorio criado por engano
+rm -rf caddy/Caddyfile         # remove o diretorio criado por engano pelo Docker
 cp caddy/Caddyfile.example caddy/Caddyfile
 docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
 ```
+
+**Se ver "ERR_SSL_PROTOCOL_ERROR":** o cert ainda nao foi gerado ou nao esta sendo lido. Confira que `certs/fullchain.crt` e `certs/privkey.key` existem e que o `caddy/Caddyfile` aponta para esses arquivos. Veja `docker logs abastecimento-caddy` para diagnostico.
 
 ### B. Certificado da empresa (.crt + .key ja prontos)
 
