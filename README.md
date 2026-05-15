@@ -112,18 +112,31 @@ A stack ja vem com um overlay pronto usando Caddy. Tres caminhos:
 Caddy gera um certificado interno automaticamente. O navegador vai mostrar aviso de seguranca e voce aceita.
 
 ```bash
-# 1) Copie o template do Caddyfile
+# 1) IMPORTANTE: copie o template do Caddyfile ANTES de subir o compose.
+#    Sem este passo o Docker cria um diretorio vazio chamado 'Caddyfile'
+#    e o container nao inicia.
 cp caddy/Caddyfile.example caddy/Caddyfile
-# (o exemplo ja vem configurado com 'tls internal' no cenario 2)
 
-# 2) No .env, ative o cookie seguro
+# 2) Confirme que e um arquivo (e nao um diretorio):
+ls -la caddy/Caddyfile
+
+# 3) No .env, ative o cookie seguro
 echo "COOKIE_SECURE=true" >> .env
 
-# 3) Suba com o overlay
+# 4) Suba com o overlay
 docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
 
-# 4) Acesse https://SEU_IP/ (no PC e no celular na mesma rede)
+# 5) Acesse https://SEU_IP/ (no PC e no celular na mesma rede)
 #    Aceite o aviso "Continuar mesmo assim"
+```
+
+**Se errar a ordem e ver "not a directory: Are you trying to mount a directory onto a file":**
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.https.yml down
+rm -rf caddy/Caddyfile         # remove o diretorio criado por engano
+cp caddy/Caddyfile.example caddy/Caddyfile
+docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
 ```
 
 ### B. Certificado da empresa (.crt + .key ja prontos)
