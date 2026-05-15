@@ -119,13 +119,13 @@ export default function BrandingForm({ onChange }) {
       });
       const d = await r.json();
       if (!r.ok) { setErro(d.error || 'Falha ao salvar'); setSalvando(false); return; }
-      setSucesso('Salvo! As alteracoes vao aparecer em todo o sistema.');
+      setSucesso('Salvo! As alterações vão aparecer em todo o sistema.');
       setNovoLight(''); setNovoDark('');
       setRemoverLight(false); setRemoverDark(false);
       await load();
       if (onChange) onChange();
     } catch (err) {
-      setErro('Erro de conexao');
+      setErro('Erro de conexão');
     } finally { setSalvando(false); }
   }
 
@@ -138,13 +138,13 @@ export default function BrandingForm({ onChange }) {
         <div style={{ marginBottom: 18 }}>
           <label>Nome do sistema</label>
           <input value={nome} onChange={(e) => setNome(e.target.value)} maxLength={80} />
-          <p className="muted" style={{ marginTop: 4 }}>Aparece no menu lateral, no titulo do navegador e na tela de login.</p>
+          <p className="muted" style={{ marginTop: 4 }}>Aparece no menu lateral, no título do navegador e na tela de login.</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 18 }}>
           <LogoUploader
             titulo="Logo (tema claro)"
-            descricao="Usado quando o tema claro esta ativo. Prefira um logo com cores escuras ou coloridas."
+            descricao="Usado quando o tema claro está ativo. Prefira um logo com cores escuras ou coloridas."
             fundo="#ffffff"
             temLogo={info.tem_logo_light && !removerLight}
             logoVersion={info.logo_light_updated_at}
@@ -154,7 +154,7 @@ export default function BrandingForm({ onChange }) {
           />
           <LogoUploader
             titulo="Logo (tema escuro)"
-            descricao="Usado quando o tema escuro esta ativo. Prefira um logo com fundo transparente ou cores claras."
+            descricao="Usado quando o tema escuro está ativo. Prefira um logo com fundo transparente ou cores claras."
             fundo="#0d1117"
             temLogo={info.tem_logo_dark && !removerDark}
             logoVersion={info.logo_dark_updated_at}
@@ -165,13 +165,13 @@ export default function BrandingForm({ onChange }) {
         </div>
 
         <p className="muted" style={{ fontSize: 12, marginBottom: 14 }}>
-          Recomendado: PNG quadrado, 256x256 ou maior, fundo transparente. As imagens sao redimensionadas para 512px.
-          Se voce subir apenas um dos logos, ele sera usado nos dois temas.
+          Recomendado: PNG quadrado, 256x256 ou maior, fundo transparente. As imagens são redimensionadas para 512px.
+          Se você subir apenas um dos logos, ele será usado nos dois temas.
         </p>
 
         <div className="btn-group">
           <button type="submit" className="btn primary" disabled={salvando}>
-            {salvando ? 'Salvando...' : 'Salvar configuracoes'}
+            {salvando ? 'Salvando...' : 'Salvar configurações'}
           </button>
         </div>
       </form>

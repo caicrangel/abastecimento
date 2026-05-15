@@ -54,22 +54,22 @@ function GrupoOperacao({ op, veiculoFiltroId, onAbrirFoto }) {
             )}
           </div>
           <div className="muted" style={{ marginTop: 4, fontSize: 13 }}>
-            Inicio: <strong>{formatDateTime(op.iniciado_em)}</strong>
+            Início: <strong>{formatDateTime(op.iniciado_em)}</strong>
             {op.encerrado_em && <> - Fim: <strong>{formatDateTime(op.encerrado_em)}</strong></>}
-            {' '}- Duracao: <strong>{formatDuracao(op.duracao_min)}</strong>
+            {' '}- Duração: <strong>{formatDuracao(op.duracao_min)}</strong>
           </div>
           <div className="muted" style={{ marginTop: 2, fontSize: 13 }}>
-            Responsavel: <strong>{op.iniciado_por_nome}</strong>
+            Responsável: <strong>{op.iniciado_por_nome}</strong>
             {op.encerrado_por_nome && op.encerrado_por_nome !== op.iniciado_por_nome &&
               <> - Encerrou: <strong>{op.encerrado_por_nome}</strong></>}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
           <Stat label="Abast." valor={formatInt(op.qtd_abastecimentos)} />
-          <Stat label="Veiculos" valor={formatInt(op.veiculos_atendidos)} />
+          <Stat label="Veículos" valor={formatInt(op.veiculos_atendidos)} />
           <Stat label="Diesel" valor={`${formatNumber(op.total_diesel)} L`} />
           <Stat label="Arla32" valor={`${formatNumber(op.total_arla32)} L`} />
-          {tempoMedio != null && <Stat label="Medio/carro" valor={formatDuracao(tempoMedio)} />}
+          {tempoMedio != null && <Stat label="Tempo méd./carro" valor={formatDuracao(tempoMedio)} />}
           <div style={{ color: 'var(--muted)' }}>
             {aberto ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
           </div>
@@ -81,7 +81,7 @@ function GrupoOperacao({ op, veiculoFiltroId, onAbrirFoto }) {
           {loading ? (
             <p className="muted">Carregando abastecimentos...</p>
           ) : !abastecimentos || abastecimentos.length === 0 ? (
-            <p className="muted">Nenhum abastecimento nesta operacao{veiculoFiltroId ? ' para o veiculo filtrado' : ''}.</p>
+            <p className="muted">Nenhum abastecimento nesta operação{veiculoFiltroId ? ' para o veículo filtrado' : ''}.</p>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table>
@@ -90,7 +90,7 @@ function GrupoOperacao({ op, veiculoFiltroId, onAbrirFoto }) {
                     <th>Hora</th>
                     <th>Veiculo</th>
                     <th>Bomba</th>
-                    <th>Odometro</th>
+                    <th>Odômetro</th>
                     <th>Diesel (L)</th>
                     <th>Arla32 (L)</th>
                     <th>Operador</th>
@@ -198,18 +198,18 @@ export default function AbastecimentoList() {
         borderColor: opAberta ? 'var(--op-aberta-border)' : 'var(--op-fechada-border)',
       }}>
         {opLoading ? (
-          <p className="muted">Carregando status da operacao...</p>
+          <p className="muted">Carregando status da operação...</p>
         ) : opAberta ? (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div>
               <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, textTransform: 'uppercase' }}>
-                Operacao em andamento
+                Operação em andamento
               </div>
               <div style={{ fontSize: 18, fontWeight: 700, marginTop: 4 }}>
                 Iniciada em {formatDateTime(operacao.iniciado_em)}
               </div>
               <div className="muted" style={{ marginTop: 2 }}>
-                Por: {operacao.iniciado_por_nome} - Duracao: {formatDuracao(operacao.duracao_min)} - Abastecimentos: {operacao.qtd_abastecimentos}
+                Por: {operacao.iniciado_por_nome} - Duração: {formatDuracao(operacao.duracao_min)} - Abastecimentos: {operacao.qtd_abastecimentos}
               </div>
             </div>
             <div className="btn-group">
@@ -225,10 +225,10 @@ export default function AbastecimentoList() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div>
               <div style={{ fontSize: 12, color: 'var(--warning)', fontWeight: 600, textTransform: 'uppercase' }}>
-                Nenhuma operacao em andamento
+                Nenhuma operação em andamento
               </div>
               <div style={{ fontSize: 16, marginTop: 4 }}>
-                Inicie o abastecimento do dia (iniciante das bombas) para liberar lancamentos.
+                Inicie o abastecimento do dia (iniciante das bombas) para liberar lançamentos.
               </div>
             </div>
             <Link href="/abastecimento/iniciar" className="btn success" style={{ fontSize: 16, padding: '10px 18px' }}>
@@ -239,9 +239,9 @@ export default function AbastecimentoList() {
       </div>
 
       <div className="card">
-        <h1 style={{ margin: 0 }}>Operacoes & abastecimentos</h1>
+        <h1 style={{ margin: 0 }}>Operações & abastecimentos</h1>
         <p className="muted" style={{ marginTop: 6, marginBottom: 0 }}>
-          As operacoes do periodo aparecem agrupadas. Clique em uma para ver os abastecimentos.
+          As operações do período aparecem agrupadas. Clique em uma para ver os abastecimentos.
         </p>
       </div>
 
@@ -252,11 +252,11 @@ export default function AbastecimentoList() {
             <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div className="col">
-            <label>Ate</label>
+            <label>Até</label>
             <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
           <div className="col">
-            <label>Veiculo</label>
+            <label>Veículo</label>
             <select value={veiculoFiltro} onChange={(e) => setVeiculoFiltro(e.target.value)}>
               <option value="">Todos</option>
               {veiculos.map((v) => (
@@ -270,9 +270,9 @@ export default function AbastecimentoList() {
       {erro && <div className="card"><div className="msg error">{erro}</div></div>}
 
       {loading ? (
-        <div className="card"><p className="muted">Carregando operacoes...</p></div>
+        <div className="card"><p className="muted">Carregando operações...</p></div>
       ) : grupos.length === 0 ? (
-        <div className="card"><p className="muted">Nenhuma operacao encontrada no periodo.</p></div>
+        <div className="card"><p className="muted">Nenhuma operação encontrada no período.</p></div>
       ) : (
         grupos.map((op) => (
           <GrupoOperacao key={op.id} op={op}
@@ -284,7 +284,7 @@ export default function AbastecimentoList() {
       {verFoto && (
         <div className="modal-bg" onClick={() => setVerFoto(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Foto do odometro</h2>
+            <h2>Foto do odômetro</h2>
             <img src={verFoto} alt="odometro" style={{ width: '100%', borderRadius: 6 }} />
             <div className="btn-group" style={{ marginTop: 12 }}>
               <button className="btn" onClick={() => setVerFoto(null)}>Fechar</button>

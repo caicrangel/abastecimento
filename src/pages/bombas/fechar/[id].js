@@ -29,7 +29,7 @@ export default function FecharLeitura() {
     e.preventDefault();
     setErro('');
     setSucesso('');
-    if (!fotoEncerrante) { setErro('Foto do encerrante obrigatoria'); return; }
+    if (!fotoEncerrante) { setErro('Foto do encerrante obrigatória'); return; }
     if (Number(encerrante) < Number(leitura.iniciante)) {
       setErro(`Encerrante (${encerrante}) deve ser maior ou igual ao iniciante (${leitura.iniciante})`);
       return;
@@ -47,7 +47,7 @@ export default function FecharLeitura() {
       setSucesso('Leitura fechada!');
       setTimeout(() => router.push('/bombas'), 800);
     } catch (err) {
-      setErro('Erro de conexao'); setSalvando(false);
+      setErro('Erro de conexão'); setSalvando(false);
     }
   }
 
@@ -87,7 +87,7 @@ export default function FecharLeitura() {
               />
             </div>
             <div style={{ marginTop: 12 }}>
-              <label>Observacao (opcional)</label>
+              <label>Observação (opcional)</label>
               <textarea value={observacao} onChange={(e) => setObservacao(e.target.value)} />
             </div>
             <div className="btn-group" style={{ marginTop: 16 }}>

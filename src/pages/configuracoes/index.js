@@ -6,9 +6,9 @@ import UsuariosCrud from '@/components/admin/UsuariosCrud';
 import BrandingForm from '@/components/admin/BrandingForm';
 
 const TABS = [
-  { id: 'veiculos', label: 'Veiculos' },
+  { id: 'veiculos', label: 'Veículos' },
   { id: 'bombas', label: 'Bombas' },
-  { id: 'usuarios', label: 'Usuarios' },
+  { id: 'usuarios', label: 'Usuários' },
   { id: 'sistema', label: 'Sistema' },
 ];
 
@@ -20,13 +20,13 @@ export default function Configuracoes() {
       {(user) => (
         user.role !== 'admin' ? (
           <div className="card">
-            <h1>Configuracoes</h1>
-            <div className="msg error">Apenas administradores podem acessar esta area.</div>
+            <h1>Configurações</h1>
+            <div className="msg error">Apenas administradores podem acessar esta área.</div>
           </div>
         ) : (
           <>
             <div className="card">
-              <h1 style={{ marginBottom: 12 }}>Configuracoes</h1>
+              <h1 style={{ marginBottom: 12 }}>Configurações</h1>
               <div className="tabs">
                 {TABS.map((t) => (
                   <button

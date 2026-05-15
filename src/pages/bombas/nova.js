@@ -30,7 +30,7 @@ export default function AbrirLeitura() {
     setErro('');
     setSucesso('');
     if (!form.bomba_id) { setErro('Selecione a bomba'); return; }
-    if (!form.foto_iniciante) { setErro('Foto do iniciante obrigatoria'); return; }
+    if (!form.foto_iniciante) { setErro('Foto do iniciante obrigatória'); return; }
     setSalvando(true);
     try {
       const r = await fetch('/api/leituras-bomba', {
@@ -48,7 +48,7 @@ export default function AbrirLeitura() {
       setSucesso('Iniciante registrado! Lembre-se de fechar a leitura ao final do expediente.');
       setTimeout(() => router.push('/bombas'), 1000);
     } catch (err) {
-      setErro('Erro de conexao');
+      setErro('Erro de conexão');
       setSalvando(false);
     }
   }
@@ -56,10 +56,11 @@ export default function AbrirLeitura() {
   return (
     <Layout>
       <div className="card">
-        <h1>Abrir leitura de bomba</h1>
+        <h1>Abrir leitura avulsa de bomba</h1>
         <p className="muted">
-          Registre o <strong>iniciante</strong> e a foto no inicio do expediente.
-          O encerrante sera registrado depois, ao fechar a leitura.
+          Use esta tela apenas para leituras avulsas, fora de uma operação do dia.
+          Registre o <strong>iniciante</strong> e a foto no início do expediente.
+          O encerrante será registrado depois, ao fechar a leitura.
         </p>
         <form onSubmit={submit}>
           {erro && <div className="msg error">{erro}</div>}
@@ -96,7 +97,7 @@ export default function AbrirLeitura() {
             />
           </div>
           <div style={{ marginTop: 12 }}>
-            <label>Observacao</label>
+            <label>Observação</label>
             <textarea value={form.observacao} onChange={(e) => update('observacao', e.target.value)} />
           </div>
           <div className="btn-group" style={{ marginTop: 16 }}>

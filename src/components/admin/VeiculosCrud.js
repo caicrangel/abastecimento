@@ -37,7 +37,7 @@ export default function VeiculosCrud() {
   }
 
   async function excluir(v) {
-    if (!confirm(`Excluir veiculo ${v.prefixo}?`)) return;
+    if (!confirm(`Excluir veículo ${v.prefixo}?`)) return;
     const r = await fetch(`/api/veiculos/${v.id}`, { method: 'DELETE', credentials: 'same-origin' });
     const d = await r.json();
     if (!r.ok) { alert(d.error || 'Falha ao excluir'); return; }
@@ -47,15 +47,15 @@ export default function VeiculosCrud() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-        <h2 style={{ margin: 0 }}>Veiculos</h2>
-        <button className="btn primary" onClick={novo}>+ Novo veiculo</button>
+        <h2 style={{ margin: 0 }}>Veículos</h2>
+        <button className="btn primary" onClick={novo}>+ Novo veículo</button>
       </div>
       {loading ? <p className="muted">Carregando...</p> : (
         <div style={{ overflowX: 'auto' }}>
           <table>
             <thead>
               <tr>
-                <th>Prefixo</th><th>Placa</th><th>Modelo</th><th>Status</th><th>Acoes</th>
+                <th>Prefixo</th><th>Placa</th><th>Modelo</th><th>Status</th><th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -82,7 +82,7 @@ export default function VeiculosCrud() {
       {editando && (
         <div className="modal-bg" onClick={() => setEditando(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{editando.id ? 'Editar veiculo' : 'Novo veiculo'}</h2>
+            <h2>{editando.id ? 'Editar veículo' : 'Novo veículo'}</h2>
             <form onSubmit={salvar}>
               {erro && <div className="msg error">{erro}</div>}
               <div style={{ marginBottom: 10 }}>

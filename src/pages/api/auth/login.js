@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Falha ao inicializar admin: ' + err.message });
   }
   const { username, password } = req.body || {};
-  if (!username || !password) return badRequest(res, 'Usuario e senha sao obrigatorios');
+  if (!username || !password) return badRequest(res, 'Usuário e senha são obrigatórios');
   let user;
   try {
     user = await queryOne(
@@ -26,22 +26,22 @@ export default async function handler(req, res) {
   }
   if (!user) {
     log.warn(`login: usuario nao encontrado: ${username}`);
-    return res.status(401).json({ error: 'Credenciais invalidas' });
+    return res.status(401).json({ error: 'Credenciais inválidas' });
   }
   if (!user.ativo) {
     log.warn(`login: usuario inativo: ${username}`);
-    return res.status(401).json({ error: 'Usuario inativo' });
+    return res.status(401).json({ error: 'Usuário inativo' });
   }
   const ok = await verifyPassword(password, user.password_hash);
   if (!ok) {
     log.warn(`login: senha incorreta para ${username}`);
-    return res.status(401).json({ error: 'Credenciais invalidas' });
+    return res.status(401).json({ error: 'Credenciais inválidas' });
   }
   try {
     createSession(res, user);
   } catch (err) {
     log.error('login: createSession falhou:', err.message);
-    return res.status(500).json({ error: 'Falha ao criar sessao: ' + err.message });
+    return res.status(500).json({ error: 'Falha ao criar sessão: ' + err.message });
   }
   log.info(`login OK: ${user.username} (${user.role})`);
   return res.json({

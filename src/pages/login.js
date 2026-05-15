@@ -42,7 +42,7 @@ export default function Login() {
       }
       router.replace('/abastecimento');
     } catch (err) {
-      setErro('Erro de conexao');
+      setErro('Erro de conexão');
       setLoading(false);
     }
   }
@@ -78,7 +78,7 @@ export default function Login() {
         <form onSubmit={submit}>
           {erro && <div className="msg error">{erro}</div>}
           <div style={{ marginBottom: 12 }}>
-            <label>Usuario</label>
+            <label>Usuário</label>
             <input
               type="text"
               autoFocus

@@ -53,7 +53,7 @@ export default function BombasCrud() {
         <div style={{ overflowX: 'auto' }}>
           <table>
             <thead>
-              <tr><th>Codigo</th><th>Descricao</th><th>Combustivel</th><th>Status</th><th>Acoes</th></tr>
+              <tr><th>Código</th><th>Descrição</th><th>Combustível</th><th>Status</th><th>Ações</th></tr>
             </thead>
             <tbody>
               {rows.map((b) => (
@@ -82,17 +82,17 @@ export default function BombasCrud() {
             <form onSubmit={salvar}>
               {erro && <div className="msg error">{erro}</div>}
               <div style={{ marginBottom: 10 }}>
-                <label>Codigo *</label>
+                <label>Código *</label>
                 <input required value={editando.codigo}
                   onChange={(e) => setEditando({ ...editando, codigo: e.target.value })} />
               </div>
               <div style={{ marginBottom: 10 }}>
-                <label>Descricao</label>
+                <label>Descrição</label>
                 <input value={editando.descricao || ''}
                   onChange={(e) => setEditando({ ...editando, descricao: e.target.value })} />
               </div>
               <div style={{ marginBottom: 10 }}>
-                <label>Combustivel *</label>
+                <label>Combustível *</label>
                 <select value={editando.combustivel}
                   onChange={(e) => setEditando({ ...editando, combustivel: e.target.value })}>
                   <option value="diesel">Diesel</option>

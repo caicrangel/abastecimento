@@ -59,15 +59,15 @@ export function requireAuth(handler, opts = {}) {
     try {
       await initApp();
     } catch (err) {
-      return res.status(500).json({ error: 'Falha na inicializacao do servidor: ' + err.message });
+      return res.status(500).json({ error: 'Falha na inicialização do servidor: ' + err.message });
     }
     try {
       const user = await getCurrentUser(req);
       if (!user) {
-        return res.status(401).json({ error: 'Nao autenticado' });
+        return res.status(401).json({ error: 'Não autenticado' });
       }
       if (opts.role && user.role !== opts.role) {
-        return res.status(403).json({ error: 'Sem permissao' });
+        return res.status(403).json({ error: 'Sem permissão' });
       }
       req.user = user;
       return handler(req, res);

@@ -36,7 +36,7 @@ export default function UsuariosCrud() {
   }
 
   async function excluir(u) {
-    if (!confirm(`Excluir usuario ${u.username}?`)) return;
+    if (!confirm(`Excluir usuário ${u.username}?`)) return;
     const r = await fetch(`/api/usuarios/${u.id}`, { method: 'DELETE', credentials: 'same-origin' });
     const d = await r.json();
     if (!r.ok) { alert(d.error || 'Falha ao excluir'); return; }
@@ -46,14 +46,14 @@ export default function UsuariosCrud() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-        <h2 style={{ margin: 0 }}>Usuarios</h2>
-        <button className="btn primary" onClick={novo}>+ Novo usuario</button>
+        <h2 style={{ margin: 0 }}>Usuários</h2>
+        <button className="btn primary" onClick={novo}>+ Novo usuário</button>
       </div>
       {loading ? <p className="muted">Carregando...</p> : (
         <div style={{ overflowX: 'auto' }}>
           <table>
             <thead>
-              <tr><th>Usuario</th><th>Nome</th><th>Perfil</th><th>Status</th><th>Acoes</th></tr>
+              <tr><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>
             </thead>
             <tbody>
               {rows.map((u) => (
@@ -78,11 +78,11 @@ export default function UsuariosCrud() {
       {editando && (
         <div className="modal-bg" onClick={() => setEditando(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{editando.id ? 'Editar usuario' : 'Novo usuario'}</h2>
+            <h2>{editando.id ? 'Editar usuário' : 'Novo usuário'}</h2>
             <form onSubmit={salvar}>
               {erro && <div className="msg error">{erro}</div>}
               <div style={{ marginBottom: 10 }}>
-                <label>Usuario (login) *</label>
+                <label>Usuário (login) *</label>
                 <input required value={editando.username}
                   onChange={(e) => setEditando({ ...editando, username: e.target.value })} />
               </div>

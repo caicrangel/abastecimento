@@ -7,10 +7,10 @@ import { IconSun, IconMoon, IconChevronLeft, IconChevronRight, IconLogout } from
 const ITEMS_BASE = [
   { href: '/abastecimento', label: 'Abastecimento', icon: 'A' },
   { href: '/bombas', label: 'Bombas', icon: 'B' },
-  { href: '/relatorios', label: 'Relatorios', icon: 'R' },
+  { href: '/relatorios', label: 'Relatórios', icon: 'R' },
 ];
 const ITEMS_ADMIN = [
-  { href: '/configuracoes', label: 'Configuracoes', icon: 'C' },
+  { href: '/configuracoes', label: 'Configurações', icon: 'C' },
 ];
 
 export default function Sidebar({ user, branding, onLogout }) {

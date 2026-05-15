@@ -21,7 +21,7 @@ export function bufferToDataUrl(buffer, mime) {
 
 export function methodNotAllowed(res, allowed) {
   res.setHeader('Allow', allowed.join(', '));
-  return res.status(405).json({ error: 'Metodo nao permitido' });
+  return res.status(405).json({ error: 'Método não permitido' });
 }
 
 export function badRequest(res, message) {

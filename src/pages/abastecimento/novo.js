@@ -38,13 +38,13 @@ export default function NovoAbastecimento() {
       const r = await fetch(`/api/veiculos/by-token/${encodeURIComponent(token)}`);
       const d = await r.json();
       if (!r.ok) {
-        setErro(d.error || 'Veiculo nao encontrado');
+        setErro(d.error || 'Veículo não encontrado');
         return;
       }
       setVeiculo(d.data);
       setStep('form');
     } catch (err) {
-      setErro('Erro ao validar codigo');
+      setErro('Erro ao validar código');
     }
   }
 
@@ -57,7 +57,7 @@ export default function NovoAbastecimento() {
     setErro('');
     setSucesso('');
     if (!form.foto_odometro) {
-      setErro('Foto do odometro obrigatoria');
+      setErro('Foto do odômetro obrigatória');
       return;
     }
     const diesel = Number(form.qtd_diesel || 0);
@@ -90,7 +90,7 @@ export default function NovoAbastecimento() {
       setSucesso('Abastecimento registrado!');
       setTimeout(() => router.push('/abastecimento'), 800);
     } catch (err) {
-      setErro('Erro de conexao');
+      setErro('Erro de conexão');
       setSalvando(false);
     }
   }
@@ -105,7 +105,7 @@ export default function NovoAbastecimento() {
         <div className="card">
           <h1>Novo abastecimento</h1>
           <div className="msg error">
-            Nenhuma operacao aberta. Inicie o abastecimento do dia (iniciante das bombas) antes de registrar abastecimentos.
+            Nenhuma operação aberta. Inicie o abastecimento do dia (iniciante das bombas) antes de registrar abastecimentos.
           </div>
           <div className="btn-group">
             <button className="btn success" onClick={() => router.push('/abastecimento/iniciar')}>
@@ -124,7 +124,7 @@ export default function NovoAbastecimento() {
         <h1>Novo abastecimento</h1>
         {step === 'scan' && (
           <>
-            <p className="muted">1. Escaneie o QRCode do veiculo</p>
+            <p className="muted">1. Escaneie o QRCode do veículo</p>
             {erro && <div className="msg error">{erro}</div>}
             <QRScanner onScan={onScan} />
           </>
@@ -132,7 +132,7 @@ export default function NovoAbastecimento() {
         {step === 'form' && veiculo && (
           <form onSubmit={submit}>
             <div className="msg info">
-              Veiculo: <strong>{veiculo.prefixo}</strong>
+              Veículo: <strong>{veiculo.prefixo}</strong>
               {veiculo.placa ? ` (${veiculo.placa})` : ''}
               {veiculo.modelo ? ` - ${veiculo.modelo}` : ''}
               <button type="button" className="btn" style={{ marginLeft: 12, padding: '3px 8px' }}
@@ -153,7 +153,7 @@ export default function NovoAbastecimento() {
                 </select>
               </div>
               <div className="col">
-                <label>Odometro (km) *</label>
+                <label>Odômetro (km) *</label>
                 <input type="number" required min="0" value={form.odometro}
                   onChange={(e) => update('odometro', e.target.value)} />
               </div>
@@ -172,14 +172,14 @@ export default function NovoAbastecimento() {
             </div>
             <div style={{ marginTop: 12 }}>
               <FotoCaptura
-                label="Foto do odometro"
+                label="Foto do odômetro"
                 required
                 value={form.foto_odometro}
                 onChange={(v) => update('foto_odometro', v)}
               />
             </div>
             <div style={{ marginTop: 12 }}>
-              <label>Observacao</label>
+              <label>Observação</label>
               <textarea value={form.observacao} onChange={(e) => update('observacao', e.target.value)} />
             </div>
             <div className="btn-group" style={{ marginTop: 16 }}>

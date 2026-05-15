@@ -2,15 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import FotoCaptura from '@/components/FotoCaptura';
-import { formatDateTime, formatNumber } from '@/lib/format';
-
-function formatDuracao(min) {
-  if (min == null) return '-';
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  if (h === 0) return `${m}min`;
-  return `${h}h ${m}min`;
-}
+import { formatDateTime, formatNumber, formatDuracao } from '@/lib/format';
 
 export default function EncerrarOperacao() {
   const router = useRouter();
@@ -48,7 +40,7 @@ export default function EncerrarOperacao() {
         setErro(`Encerrante da bomba ${l.bomba_codigo} (${e2.encerrante}) deve ser >= iniciante (${l.iniciante})`);
         return;
       }
-      if (!e2.foto) { setErro(`Foto do encerrante da bomba ${l.bomba_codigo} obrigatoria`); return; }
+      if (!e2.foto) { setErro(`Foto do encerrante da bomba ${l.bomba_codigo} obrigatória`); return; }
     }
     setSalvando(true);
     try {
@@ -68,10 +60,10 @@ export default function EncerrarOperacao() {
       });
       const d = await r.json();
       if (!r.ok) { setErro(d.error || 'Falha'); setSalvando(false); return; }
-      setSucesso('Operacao encerrada!');
+      setSucesso('Operação encerrada!');
       setTimeout(() => router.push('/abastecimento'), 800);
     } catch (err) {
-      setErro('Erro de conexao: ' + err.message);
+      setErro('Erro de conexão: ' + err.message);
       setSalvando(false);
     }
   }
@@ -81,7 +73,7 @@ export default function EncerrarOperacao() {
       <Layout>
         <div className="card">
           <h1>Encerrar abastecimento do dia</h1>
-          <div className="msg info">Nenhuma operacao aberta no momento.</div>
+          <div className="msg info">Nenhuma operação aberta no momento.</div>
           <button className="btn" onClick={() => router.push('/abastecimento')}>Voltar</button>
         </div>
       </Layout>
@@ -93,11 +85,11 @@ export default function EncerrarOperacao() {
       <div className="card">
         <h1>Encerrar abastecimento do dia</h1>
         <div className="msg info">
-          Operacao iniciada em <strong>{formatDateTime(op.iniciado_em)}</strong> por {op.iniciado_por_nome}.<br/>
-          Duracao ate o momento: <strong>{formatDuracao(op.duracao_min)}</strong> -
+          Operação iniciada em <strong>{formatDateTime(op.iniciado_em)}</strong> por {op.iniciado_por_nome}.<br/>
+          Duração até o momento: <strong>{formatDuracao(op.duracao_min)}</strong> -
           Abastecimentos: <strong>{op.qtd_abastecimentos}</strong>
           {op.qtd_abastecimentos > 0 && (
-            <> - Tempo medio por carro: <strong>{formatDuracao(Math.round(op.duracao_min / op.qtd_abastecimentos))}</strong></>
+            <> - Tempo médio por carro: <strong>{formatDuracao(Math.round(op.duracao_min / op.qtd_abastecimentos))}</strong></>
           )}
         </div>
         <form onSubmit={submit}>
@@ -107,7 +99,7 @@ export default function EncerrarOperacao() {
             const e = encerrantes[l.id] || { encerrante: '', foto: '' };
             const consumo = Number(e.encerrante || 0) - Number(l.iniciante);
             return (
-              <div key={l.id} className="card" style={{ background: '#f6f8fa', marginTop: 12 }}>
+              <div key={l.id} className="card" style={{ background: 'var(--surface-elevated)', marginTop: 12 }}>
                 <h2 style={{ marginBottom: 8 }}>
                   {l.bomba_codigo} <span className={`tag ${l.combustivel}`}>{l.combustivel}</span>
                 </h2>
@@ -138,12 +130,12 @@ export default function EncerrarOperacao() {
             );
           })}
           <div style={{ marginTop: 12 }}>
-            <label>Observacao (opcional)</label>
+            <label>Observação (opcional)</label>
             <textarea value={observacao} onChange={(e) => setObservacao(e.target.value)} />
           </div>
           <div className="btn-group" style={{ marginTop: 16 }}>
             <button type="submit" className="btn danger" disabled={salvando}>
-              {salvando ? 'Encerrando...' : '⏹ Encerrar operacao'}
+              {salvando ? 'Encerrando...' : '⏹ Encerrar operação'}
             </button>
             <button type="button" className="btn" onClick={() => router.push('/abastecimento')}>Cancelar</button>
           </div>

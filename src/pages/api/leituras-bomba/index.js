@@ -10,12 +10,13 @@ export const config = {
 
 async function handler(req, res) {
   if (req.method === 'GET') {
-    const { from, to, bomba_id, status } = req.query;
+    const { from, to, bomba_id, status, operacao_id } = req.query;
     const where = [];
     const params = [];
     if (from) { where.push('l.data_leitura >= ?'); params.push(from); }
     if (to) { where.push('l.data_leitura <= ?'); params.push(to); }
     if (bomba_id) { where.push('l.bomba_id = ?'); params.push(Number(bomba_id)); }
+    if (operacao_id) { where.push('l.operacao_id = ?'); params.push(Number(operacao_id)); }
     if (status === 'aberta') where.push('l.encerrante IS NULL');
     if (status === 'fechada') where.push('l.encerrante IS NOT NULL');
     const sql = `

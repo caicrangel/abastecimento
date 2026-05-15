@@ -22,7 +22,7 @@ export default function Layout({ children, user }) {
       })
       .catch((err) => {
         if (abort) return;
-        setErro('Erro de conexao com servidor: ' + err.message);
+        setErro('Erro de conexão com servidor: ' + err.message);
       });
     return () => { abort = true; };
   }, [u, router]);

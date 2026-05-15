@@ -41,8 +41,8 @@ export default function AlertaEncerrante() {
   function disparaAlerta(lista) {
     const n = lista.length;
     const msg = n === 1
-      ? `Ha 1 bomba com encerrante pendente: ${lista[0].bomba_codigo}`
-      : `Ha ${n} bombas com encerrante pendente`;
+      ? `Há 1 bomba com encerrante pendente: ${lista[0].bomba_codigo}`
+      : `Há ${n} bombas com encerrante pendente`;
     if (typeof window !== 'undefined' && 'Notification' in window
         && Notification.permission === 'granted') {
       try {
@@ -69,12 +69,12 @@ export default function AlertaEncerrante() {
 
   return (
     <div style={{
-      background: '#fff8c5', color: '#7a5d00',
-      borderBottom: '1px solid #d4a72c',
+      background: 'var(--alerta-bg)', color: 'var(--alerta-fg)',
+      borderBottom: '1px solid var(--alerta-border)',
       padding: '8px 16px', fontSize: 14,
       display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
     }}>
-      <strong>Atencao:</strong>
+      <strong>Atenção:</strong>
       <span>
         {abertas.length === 1
           ? `1 bomba com encerrante pendente: ${abertas[0].bomba_codigo} (${abertas[0].minutos_aberta}min)`

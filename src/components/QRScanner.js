@@ -43,7 +43,7 @@ export default function QRScanner({ onScan, onCancel }) {
   async function iniciarCamera() {
     setErro(''); setInfo('');
     if (!navigator.mediaDevices?.getUserMedia) {
-      setErro('Camera ao vivo nao disponivel neste contexto. Use "Tirar foto" abaixo, que abre a camera do celular e funciona em qualquer rede.');
+      setErro('Câmera ao vivo não disponível neste contexto. Use "Tirar foto" abaixo, que abre a câmera do celular e funciona em qualquer rede.');
       return;
     }
     setIniciando(true);
@@ -66,13 +66,13 @@ export default function QRScanner({ onScan, onCancel }) {
       const nome = err?.name || '';
       let msg = err?.message || 'erro desconhecido';
       if (nome === 'NotAllowedError') {
-        msg = 'Permissao da camera negada. Em HTTP, navegadores bloqueiam a camera por seguranca. Use "Tirar foto" abaixo (funciona em HTTP) ou habilite HTTPS no servidor.';
+        msg = 'Permissão da câmera negada. Em HTTP, navegadores bloqueiam a câmera por segurança. Use "Tirar foto" abaixo (funciona em HTTP) ou habilite HTTPS no servidor.';
       } else if (nome === 'NotFoundError') {
-        msg = 'Nenhuma camera encontrada neste dispositivo.';
+        msg = 'Nenhuma câmera encontrada neste dispositivo.';
       } else if (nome === 'NotReadableError') {
-        msg = 'Camera em uso por outro aplicativo.';
+        msg = 'Câmera em uso por outro aplicativo.';
       } else if (nome === 'SecurityError' || /secure/i.test(msg)) {
-        msg = 'Camera ao vivo so funciona em HTTPS. Use "Tirar foto" abaixo, que abre a camera nativa do celular sem essa restricao.';
+        msg = 'Câmera ao vivo só funciona em HTTPS. Use "Tirar foto" abaixo, que abre a câmera nativa do celular sem essa restrição.';
       }
       setErro(msg);
     }
@@ -113,6 +113,7 @@ export default function QRScanner({ onScan, onCancel }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setErro(''); setInfo('Decodificando QRCode da foto...');
+
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -133,7 +134,7 @@ export default function QRScanner({ onScan, onCancel }) {
       if (code && code.data) {
         onScan(code.data);
       } else {
-        setErro('Nao foi possivel ler o QRCode nessa foto. Tente novamente com mais luz, mais foco, ou digite o codigo manualmente.');
+        setErro('Não foi possível ler o QRCode nessa foto. Tente novamente com mais luz, mais foco, ou digite o código manualmente.');
       }
       URL.revokeObjectURL(img.src);
     };
@@ -156,8 +157,8 @@ export default function QRScanner({ onScan, onCancel }) {
         <div className="msg info" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <IconLock />
           <span>
-            Conexao HTTP detectada. A camera ao vivo so funciona em HTTPS (localhost ou certificado).
-            <strong> Use "Tirar foto"</strong> abaixo - abre a camera nativa do celular e funciona normalmente.
+            Conexão HTTP detectada. A câmera ao vivo só funciona em HTTPS (localhost ou certificado).
+            <strong> Use "Tirar foto"</strong> abaixo - abre a câmera nativa do celular e funciona normalmente.
           </span>
         </div>
       )}
@@ -173,7 +174,7 @@ export default function QRScanner({ onScan, onCancel }) {
               style={{ justifyContent: 'center', padding: '10px 14px' }}
             >
               <IconCamera />
-              <span>{iniciando ? 'Abrindo camera...' : 'Ler QRCode com a camera'}</span>
+              <span>{iniciando ? 'Abrindo câmera...' : 'Ler QRCode com a câmera'}</span>
             </button>
           )}
           <button
@@ -202,11 +203,11 @@ export default function QRScanner({ onScan, onCancel }) {
             <video ref={videoRef} playsInline muted autoPlay />
           </div>
           <p className="muted" style={{ textAlign: 'center', marginTop: 8 }}>
-            Aponte a camera para o QRCode
+            Aponte a câmera para o QRCode
           </p>
           <div className="btn-group" style={{ justifyContent: 'center', marginTop: 8 }}>
             <button type="button" className="btn" onClick={parar}>
-              <IconStop /> <span>Parar camera</span>
+              <IconStop /> <span>Parar câmera</span>
             </button>
           </div>
         </>
@@ -223,7 +224,7 @@ export default function QRScanner({ onScan, onCancel }) {
           background: 'var(--surface-elevated)', display: 'inline-flex',
           alignItems: 'center', gap: 6, fontSize: 13,
         }}>
-          <IconKeyboard size={14} /> <span>Digitar codigo manualmente</span>
+          <IconKeyboard size={14} /> <span>Digitar código manualmente</span>
         </summary>
         <form onSubmit={submitManual} style={{ marginTop: 10 }}>
           <input
@@ -234,7 +235,7 @@ export default function QRScanner({ onScan, onCancel }) {
           />
           <div className="btn-group" style={{ marginTop: 10 }}>
             <button type="submit" className="btn primary" disabled={!manual.trim()}>
-              Confirmar codigo
+              Confirmar código
             </button>
             {onCancel && (
               <button type="button" className="btn" onClick={() => { parar(); onCancel(); }}>

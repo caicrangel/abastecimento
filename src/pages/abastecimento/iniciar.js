@@ -41,7 +41,7 @@ export default function IniciarOperacao() {
     for (const b of bombas) {
       const l = leituras[b.id];
       if (!l || l.iniciante === '') { setErro(`Informe o iniciante da bomba ${b.codigo}`); return; }
-      if (!l.foto) { setErro(`Foto do iniciante da bomba ${b.codigo} obrigatoria`); return; }
+      if (!l.foto) { setErro(`Foto do iniciante da bomba ${b.codigo} obrigatória`); return; }
     }
     setSalvando(true);
     try {
@@ -62,10 +62,10 @@ export default function IniciarOperacao() {
       });
       const d = await r.json();
       if (!r.ok) { setErro(d.error || 'Falha ao iniciar'); setSalvando(false); return; }
-      setSucesso('Operacao iniciada!');
+      setSucesso('Operação iniciada!');
       setTimeout(() => router.push('/abastecimento'), 800);
     } catch (err) {
-      setErro('Erro de conexao: ' + err.message);
+      setErro('Erro de conexão: ' + err.message);
       setSalvando(false);
     }
   }
@@ -78,12 +78,12 @@ export default function IniciarOperacao() {
         <div className="card">
           <h1>Iniciar abastecimento do dia</h1>
           <div className="msg info">
-            Ja existe uma operacao em andamento iniciada em {new Date(opAberta.iniciado_em).toLocaleString('pt-BR')}.
-            Encerre a operacao atual antes de iniciar uma nova.
+            Já existe uma operação em andamento iniciada em {new Date(opAberta.iniciado_em).toLocaleString('pt-BR')}.
+            Encerre a operação atual antes de iniciar uma nova.
           </div>
           <div className="btn-group">
             <button className="btn primary" onClick={() => router.push('/abastecimento/encerrar')}>
-              Ir para encerrar operacao
+              Ir para encerrar operação
             </button>
             <button className="btn" onClick={() => router.push('/abastecimento')}>Voltar</button>
           </div>
@@ -97,7 +97,7 @@ export default function IniciarOperacao() {
       <Layout>
         <div className="card">
           <h1>Iniciar abastecimento do dia</h1>
-          <div className="msg error">Nenhuma bomba ativa cadastrada. Cadastre as bombas em Cad. Bombas antes de iniciar.</div>
+          <div className="msg error">Nenhuma bomba ativa cadastrada. Cadastre as bombas em Configurações antes de iniciar.</div>
         </div>
       </Layout>
     );
@@ -108,8 +108,8 @@ export default function IniciarOperacao() {
       <div className="card">
         <h1>Iniciar abastecimento do dia</h1>
         <p className="muted">
-          Registre o iniciante de <strong>cada uma das {bombas.length} bombas ativas</strong> para abrir a operacao.
-          Sem essas leituras, nao e possivel registrar abastecimentos.
+          Registre o iniciante de <strong>cada uma das {bombas.length} bombas ativas</strong> para abrir a operação.
+          Sem essas leituras, não é possível registrar abastecimentos.
         </p>
         <form onSubmit={submit}>
           {erro && <div className="msg error">{erro}</div>}
@@ -122,7 +122,7 @@ export default function IniciarOperacao() {
           </div>
 
           {bombas.map((b) => (
-            <div key={b.id} className="card" style={{ background: '#f6f8fa', marginTop: 12 }}>
+            <div key={b.id} className="card" style={{ background: 'var(--surface-elevated)', marginTop: 12 }}>
               <h2 style={{ marginBottom: 8 }}>
                 {b.codigo} <span className={`tag ${b.combustivel}`}>{b.combustivel}</span>
               </h2>
@@ -146,12 +146,12 @@ export default function IniciarOperacao() {
           ))}
 
           <div style={{ marginTop: 12 }}>
-            <label>Observacao (opcional)</label>
+            <label>Observação (opcional)</label>
             <textarea value={observacao} onChange={(e) => setObservacao(e.target.value)} />
           </div>
           <div className="btn-group" style={{ marginTop: 16 }}>
             <button type="submit" className="btn success" disabled={salvando}>
-              {salvando ? 'Iniciando...' : '▶ Iniciar operacao'}
+              {salvando ? 'Iniciando...' : '▶ Iniciar operação'}
             </button>
             <button type="button" className="btn" onClick={() => router.push('/abastecimento')}>Cancelar</button>
           </div>
