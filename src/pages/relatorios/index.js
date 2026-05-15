@@ -65,7 +65,7 @@ export default function Relatorios() {
             <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
           <div className="col">
-            <label>Veiculos sem abastecer ha N dias</label>
+            <label>Veículos sem abastecer há N dias</label>
             <input type="number" min="1" value={dias} onChange={(e) => setDias(Number(e.target.value) || 1)} />
           </div>
           <div className="col" style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -76,49 +76,49 @@ export default function Relatorios() {
 
       {resumo && (
         <>
-          <h2 style={{ marginTop: 8 }}>Resumo do periodo ({formatDate(from)} a {formatDate(to)})</h2>
+          <h2 style={{ marginTop: 8 }}>Resumo do período ({formatDate(from)} a {formatDate(to)})</h2>
           <div className="row" style={{ marginBottom: 16 }}>
             <Card titulo="Abastecimentos" valor={formatInt(resumo.abastecimentos.total)} />
             <Card titulo="Diesel abastecido" valor={formatNumber(resumo.abastecimentos.diesel)} sufixo="L" cor="#0969da" />
             <Card titulo="Arla32 abastecido" valor={formatNumber(resumo.abastecimentos.arla32)} sufixo="L" cor="#1a7f37" />
-            <Card titulo="Veiculos atendidos" valor={`${resumo.abastecimentos.veiculos_atendidos}/${resumo.veiculos.ativos}`} />
+            <Card titulo="Veículos atendidos" valor={`${resumo.abastecimentos.veiculos_atendidos}/${resumo.veiculos.ativos}`} />
           </div>
           <div className="row" style={{ marginBottom: 16 }}>
             <Card titulo="Leituras de bomba" valor={formatInt(resumo.bombas.leituras)} />
             <Card titulo="Leituras abertas" valor={formatInt(resumo.bombas.abertas)} cor={resumo.bombas.abertas > 0 ? '#bf8700' : undefined} />
             <Card titulo="Volume registrado (bombas)" valor={formatNumber(resumo.bombas.volume)} sufixo="L" />
-            <Card titulo="Veiculos sem abastecer" valor={formatInt(resumo.veiculos.nao_atendidos)} cor={resumo.veiculos.nao_atendidos > 0 ? '#bf8700' : undefined} />
+            <Card titulo="Veículos sem abastecer" valor={formatInt(resumo.veiculos.nao_atendidos)} cor={resumo.veiculos.nao_atendidos > 0 ? '#bf8700' : undefined} />
           </div>
         </>
       )}
 
       {operacoesResumo && (
         <>
-          <h2>Operacoes encerradas no periodo</h2>
+          <h2>Operações encerradas no período</h2>
           <div className="row" style={{ marginBottom: 16 }}>
-            <Card titulo="Operacoes" valor={formatInt(operacoesResumo.total)} />
-            <Card titulo="Duracao media" valor={formatDuracao(operacoesResumo.duracao_media_min)} />
-            <Card titulo="Mais rapida" valor={formatDuracao(operacoesResumo.duracao_min_min)} />
+            <Card titulo="Operações" valor={formatInt(operacoesResumo.total)} />
+            <Card titulo="Duração média" valor={formatDuracao(operacoesResumo.duracao_media_min)} />
+            <Card titulo="Mais rápida" valor={formatDuracao(operacoesResumo.duracao_min_min)} />
             <Card titulo="Mais demorada" valor={formatDuracao(operacoesResumo.duracao_max_min)} />
           </div>
         </>
       )}
 
       <div className="card">
-        <h2>Operacoes (historico do periodo)</h2>
+        <h2>Operações (histórico do período)</h2>
         {operacoes.length === 0 ? (
-          <p className="muted">Nenhuma operacao encerrada no periodo.</p>
+          <p className="muted">Nenhuma operação encerrada no período.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table>
               <thead>
                 <tr>
                   <th>Data</th>
-                  <th>Inicio</th>
+                  <th>Início</th>
                   <th>Fim</th>
-                  <th>Duracao</th>
+                  <th>Duração</th>
                   <th>Abastecimentos</th>
-                  <th>Tempo medio/carro</th>
+                  <th>Tempo méd./carro</th>
                   <th>Diesel (L)</th>
                   <th>Arla32 (L)</th>
                   <th>Vol. bombas (L)</th>
@@ -151,9 +151,9 @@ export default function Relatorios() {
       </div>
 
       <div className="card">
-        <h2>Consumo por veiculo (km/L)</h2>
+        <h2>Consumo por veículo (km/L)</h2>
         {consumoVeiculo.length === 0 ? (
-          <p className="muted">Sem dados no periodo.</p>
+          <p className="muted">Sem dados no período.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table>
@@ -166,7 +166,7 @@ export default function Relatorios() {
                   <th>Arla32 (L)</th>
                   <th>Km rodado</th>
                   <th>Km/L</th>
-                  <th>Ultimo</th>
+                  <th>Último</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,9 +197,9 @@ export default function Relatorios() {
       </div>
 
       <div className="card">
-        <h2>Veiculos sem abastecer ha {dias} dia(s) ou mais</h2>
+        <h2>Veículos sem abastecer há {dias} dia(s) ou mais</h2>
         {semAbastecer.length === 0 ? (
-          <p className="muted">Todos os veiculos ativos abasteceram recentemente.</p>
+          <p className="muted">Todos os veículos ativos abasteceram recentemente.</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table>
@@ -208,7 +208,7 @@ export default function Relatorios() {
                   <th>Prefixo</th>
                   <th>Placa</th>
                   <th>Modelo</th>
-                  <th>Ultimo abastecimento</th>
+                  <th>Último abastecimento</th>
                   <th>Dias sem abastecer</th>
                 </tr>
               </thead>
@@ -233,7 +233,7 @@ export default function Relatorios() {
       </div>
 
       <div className="card">
-        <h2>Consumo diario (ultimos 30 dias)</h2>
+        <h2>Consumo diário (últimos 30 dias)</h2>
         {consumoDiario.length === 0 ? (
           <p className="muted">Sem dados.</p>
         ) : (
@@ -243,7 +243,7 @@ export default function Relatorios() {
                 <tr>
                   <th>Dia</th>
                   <th>Abastecimentos</th>
-                  <th>Veiculos</th>
+                  <th>Veículos</th>
                   <th>Diesel (L)</th>
                   <th>Arla32 (L)</th>
                 </tr>
@@ -265,45 +265,86 @@ export default function Relatorios() {
       </div>
 
       <div className="card">
-        <h2>Conferencia bombas x abastecimentos no periodo</h2>
-        <p className="muted">Compara o volume registrado nas bombas (encerrante - iniciante) com o total abastecido nos veiculos pela mesma bomba.</p>
+        <h2>Conferência bomba × abastecimento (por operação)</h2>
+        <p className="muted" style={{ marginBottom: 12 }}>
+          Para cada operação encerrada no período, compara o volume registrado em cada bomba (encerrante - iniciante)
+          com o total abastecido pelos veículos usando aquela bomba na mesma operação. Divergência próxima de zero
+          indica que os lançamentos estão consistentes.
+        </p>
         {conferencia.length === 0 ? (
-          <p className="muted">Sem dados.</p>
+          <p className="muted">Sem operações encerradas no período.</p>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Bomba</th>
-                  <th>Combustivel</th>
-                  <th>Volume bomba (L)</th>
-                  <th>Volume abastecido (L)</th>
-                  <th>Divergencia</th>
-                  <th>Leituras abertas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {conferencia.map((b) => (
-                  <tr key={b.bomba_id}>
-                    <td><strong>{b.codigo}</strong></td>
-                    <td><span className={`tag ${b.combustivel}`}>{b.combustivel}</span></td>
-                    <td>{formatNumber(b.volume_bomba)}</td>
-                    <td>{formatNumber(b.volume_abastecido)}</td>
-                    <td>
-                      <strong style={{ color: Math.abs(b.divergencia) > 1 ? '#cf222e' : '#1a7f37' }}>
-                        {b.divergencia > 0 ? '+' : ''}{formatNumber(b.divergencia)}
-                      </strong>
-                    </td>
-                    <td>
-                      {b.leituras_abertas > 0
-                        ? <span className="tag inativo">{b.leituras_abertas}</span>
-                        : '0'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          conferencia.map((op) => (
+            <div key={op.operacao_id} style={{
+              border: '1px solid var(--border)', borderRadius: 8,
+              padding: 12, marginBottom: 12,
+              borderLeft: `4px solid ${Math.abs(op.totais.divergencia) > 0.5 ? 'var(--danger)' : 'var(--success)'}`,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+                <div>
+                  <strong style={{ fontSize: 15 }}>{formatDate(op.data)}</strong>
+                  <span className="muted" style={{ marginLeft: 8, fontSize: 13 }}>
+                    {formatDateTime(op.iniciado_em)} - {formatDateTime(op.encerrado_em)} ({formatDuracao(op.duracao_min)})
+                  </span>
+                  <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                    Responsável: <strong>{op.iniciado_por_nome}</strong>
+                    {op.encerrado_por_nome && op.encerrado_por_nome !== op.iniciado_por_nome &&
+                      <> · Encerrou: <strong>{op.encerrado_por_nome}</strong></>}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="muted" style={{ fontSize: 11, textTransform: 'uppercase' }}>Divergência total</div>
+                  <div style={{
+                    fontSize: 18, fontWeight: 700,
+                    color: Math.abs(op.totais.divergencia) > 0.5 ? 'var(--danger)' : 'var(--success)',
+                  }}>
+                    {op.totais.divergencia > 0 ? '+' : ''}{formatNumber(op.totais.divergencia)} L
+                  </div>
+                </div>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Bomba</th>
+                      <th>Comb.</th>
+                      <th>Iniciante</th>
+                      <th>Encerrante</th>
+                      <th>Vol. bomba (L)</th>
+                      <th>Vol. abastecido (L)</th>
+                      <th>Divergência</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {op.bombas.length === 0 ? (
+                      <tr><td colSpan={7} className="muted">Sem leituras encerradas nesta operação.</td></tr>
+                    ) : op.bombas.map((b) => (
+                      <tr key={b.bomba_id}>
+                        <td><strong>{b.bomba_codigo}</strong></td>
+                        <td><span className={`tag ${b.combustivel}`}>{b.combustivel}</span></td>
+                        <td>{formatNumber(b.iniciante)}</td>
+                        <td>{formatNumber(b.encerrante)}</td>
+                        <td>{formatNumber(b.volume_bomba)}</td>
+                        <td>{formatNumber(b.volume_abastecido)}</td>
+                        <td>
+                          <strong style={{ color: Math.abs(b.divergencia) > 0.5 ? 'var(--danger)' : 'var(--success)' }}>
+                            {b.divergencia > 0 ? '+' : ''}{formatNumber(b.divergencia)}
+                          </strong>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {op.abastecimento_sem_bomba && (Number(op.abastecimento_sem_bomba.diesel) > 0 || Number(op.abastecimento_sem_bomba.arla32) > 0) && (
+                <div className="msg info" style={{ marginTop: 8, marginBottom: 0, fontSize: 13 }}>
+                  Atenção: esta operação tem abastecimentos sem bomba informada
+                  ({formatNumber(op.abastecimento_sem_bomba.diesel)} L diesel,
+                  {' '}{formatNumber(op.abastecimento_sem_bomba.arla32)} L arla32) - eles não entram na conferência.
+                </div>
+              )}
+            </div>
+          ))
         )}
       </div>
     </Layout>
