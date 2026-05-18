@@ -48,19 +48,12 @@ export default function QRScanner({ onScan, onCancel }) {
     }
     setIniciando(true);
     stoppedRef.current = false;
+    let stream;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } },
         audio: false,
       });
-      streamRef.current = stream;
-      const video = videoRef.current;
-      if (!video) { stream.getTracks().forEach((t) => t.stop()); return; }
-      video.srcObject = stream;
-      await video.play();
-      setScanning(true);
-      setIniciando(false);
-      iniciarLoop();
     } catch (err) {
       setIniciando(false);
       const nome = err?.name || '';
@@ -75,7 +68,35 @@ export default function QRScanner({ onScan, onCancel }) {
         msg = 'Câmera ao vivo só funciona em HTTPS. Use "Tirar foto" abaixo, que abre a câmera nativa do celular sem essa restrição.';
       }
       setErro(msg);
+      return;
     }
+
+    streamRef.current = stream;
+    setScanning(true);
+
+    requestAnimationFrame(async () => {
+      const video = videoRef.current;
+      if (!video) {
+        setErro('Falha ao iniciar pré-visualização (elemento de vídeo não disponível).');
+        setIniciando(false);
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+        setScanning(false);
+        return;
+      }
+      try {
+        video.srcObject = stream;
+        await video.play();
+        setIniciando(false);
+        iniciarLoop();
+      } catch (err) {
+        setIniciando(false);
+        setErro('Falha ao iniciar vídeo da câmera: ' + (err?.message || err));
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+        setScanning(false);
+      }
+    });
   }
 
   function iniciarLoop() {
@@ -113,7 +134,6 @@ export default function QRScanner({ onScan, onCancel }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setErro(''); setInfo('Decodificando QRCode da foto...');
-
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -197,11 +217,12 @@ export default function QRScanner({ onScan, onCancel }) {
         </div>
       )}
 
+      <div className="scanner-box" style={{ display: scanning ? 'block' : 'none' }}>
+        <video ref={videoRef} playsInline muted autoPlay />
+      </div>
+
       {scanning && (
         <>
-          <div className="scanner-box">
-            <video ref={videoRef} playsInline muted autoPlay />
-          </div>
           <p className="muted" style={{ textAlign: 'center', marginTop: 8 }}>
             Aponte a câmera para o QRCode
           </p>
